@@ -16,10 +16,7 @@ function Page() {
     return (
         <section className="flex h-screen w-full items-center justify-center p-5">
             <div className="w-full max-w-md">
-                <AuthPage 
-                    user={user}
-                    setUser={setUser}
-                />
+                <AuthPage user={user} setUser={setUser} />
             </div>
         </section>
     );
