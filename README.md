@@ -2,6 +2,10 @@
 
 A simple rip-off of social media apps like Twitter, Facebook, Instagram, etc. This is a project to learn the basics of `Next.JS`, `React`, `TailwindCSS` & `Drizzle ORM`.
 
+## Warning
+
+PLEASE DO NOT ENTER YOUR REAL PASSWORDS IN THE APP. EVEN THOUGH THE PASSWORDS ARE HASHED, THEY ARE BEING STORED IN THE BROWSER'S LOCAL STORAGE. I AM NOT RESPONSIBLE FOR ANY DATA LOSS OR LEAKS. YOU CAN USE THE INBUILT PASSWORD GENERATOR TO GENERATE A RANDOM PASSWORD, AND SAVE IT IN YOUR PASSWORD MANAGER.
+
 ## Tech Stack
 
 -   [Next.JS](https://nextjs.org/) - React Framework to build SSR React Apps with ease.
@@ -77,15 +81,15 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 
 I didn't have much time to work on this project as we are already working on a similar project, and this was just a rip-off of that project. Thank you!
 
-Read more about contributing [here](https://github.com/itsdrvgo/post-it/CONTRIBUTING.md).
+Read more about contributing [here](https://github.com/itsdrvgo/post-it/blob/master/CONTRIBUTING.md).
 
 ## License
 
-This project is licensed under the [MIT License](https://github.com/itsdrvgo/LICENSE).
+This project is licensed under the [MIT License](https://github.com/itsdrvgo/post-it/blob/master/LICENSE).
 
 ## Feedback
 
-Feel free to send me feedback on [X](https://x.com/itsdrvgo) or [file an issue](https://github.com/itsdrvgo/post-it/issues/new). Feature requests are always welcome. If you wish to contribute, please take a quick look at the [guidelines](https://github.com/itsdrvgo/post-it/blob/main/CONTRIBUTING.md)!
+Feel free to send me feedback on [X](https://x.com/itsdrvgo) or [file an issue](https://github.com/itsdrvgo/post-it/issues/new). Feature requests are always welcome. If you wish to contribute, please take a quick look at the [guidelines](https://github.com/itsdrvgo/post-it/blob/master/CONTRIBUTING.md)!
 
 ## Connect with me
 
