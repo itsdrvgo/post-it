@@ -1,0 +1,106 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    :root {
+        /* THEME : LIGHT */
+        --light-background: hsl(0, 0%, 100%);
+
+        --light-primary: hsl(240, 47%, 33%);
+        --light-primary-50: hsl(240, 47%, 13%);
+        --light-primary-100: hsl(240, 47%, 23%);
+        --light-primary-200: hsl(240, 47%, 33%);
+        --light-primary-300: hsl(240, 47%, 43%);
+        --light-primary-400: hsl(240, 47%, 53%);
+        --light-primary-500: hsl(240, 47%, 63%);
+        --light-primary-600: hsl(240, 47%, 73%);
+        --light-primary-700: hsl(240, 47%, 83%);
+        --light-primary-800: hsl(240, 47%, 93%);
+        --light-primary-900: hsl(240, 47%, 100%);
+
+        --light-secondary: hsl(240, 55%, 45%);
+        --light-secondary-50: hsl(240, 55%, 15%);
+        --light-secondary-100: hsl(240, 55%, 25%);
+        --light-secondary-200: hsl(240, 55%, 35%);
+        --light-secondary-300: hsl(240, 55%, 45%);
+        --light-secondary-400: hsl(240, 55%, 55%);
+        --light-secondary-500: hsl(240, 55%, 65%);
+        --light-secondary-600: hsl(240, 55%, 75%);
+        --light-secondary-700: hsl(240, 55%, 85%);
+        --light-secondary-800: hsl(240, 55%, 95%);
+        --light-secondary-900: hsl(240, 55%, 100%);
+
+        --light-danger: hsl(0, 75%, 31%);
+        --light-danger-50: hsl(0, 75%, 11%);
+        --light-danger-100: hsl(0, 75%, 21%);
+        --light-danger-200: hsl(0, 75%, 31%);
+        --light-danger-300: hsl(0, 75%, 41%);
+        --light-danger-400: hsl(0, 75%, 51%);
+        --light-danger-500: hsl(0, 75%, 61%);
+        --light-danger-600: hsl(0, 75%, 71%);
+        --light-danger-700: hsl(0, 75%, 81%);
+        --light-danger-800: hsl(0, 75%, 91%);
+        --light-danger-900: hsl(0, 75%, 100%);
+
+        --light-accent: hsl(240, 55%, 45%);
+        --light-foreground: hsl(0, 0%, 0%);
+
+        /* THEME : DARK */
+        --dark-background: hsl(0, 12%, 6%);
+
+        --dark-primary: hsl(240, 66%, 85%);
+        --dark-primary-50: hsl(240, 66%, 15%);
+        --dark-primary-100: hsl(240, 66%, 25%);
+        --dark-primary-200: hsl(240, 66%, 35%);
+        --dark-primary-300: hsl(240, 66%, 45%);
+        --dark-primary-400: hsl(240, 66%, 55%);
+        --dark-primary-500: hsl(240, 66%, 65%);
+        --dark-primary-600: hsl(240, 66%, 75%);
+        --dark-primary-700: hsl(240, 66%, 85%);
+        --dark-primary-800: hsl(240, 66%, 95%);
+        --dark-primary-900: hsl(240, 66%, 100%);
+
+        --dark-secondary: hsl(240, 36%, 29%);
+        --dark-secondary-50: hsl(240, 36%, 9%);
+        --dark-secondary-100: hsl(240, 36%, 19%);
+        --dark-secondary-200: hsl(240, 36%, 29%);
+        --dark-secondary-300: hsl(240, 36%, 39%);
+        --dark-secondary-400: hsl(240, 36%, 49%);
+        --dark-secondary-500: hsl(240, 36%, 59%);
+        --dark-secondary-600: hsl(240, 36%, 69%);
+        --dark-secondary-700: hsl(240, 36%, 79%);
+        --dark-secondary-800: hsl(240, 36%, 89%);
+        --dark-secondary-900: hsl(240, 36%, 100%);
+
+        --dark-danger: hsl(0, 68%, 37%);
+        --dark-danger-50: hsl(0, 68%, 17%);
+        --dark-danger-100: hsl(0, 68%, 27%);
+        --dark-danger-200: hsl(0, 68%, 37%);
+        --dark-danger-300: hsl(0, 68%, 47%);
+        --dark-danger-400: hsl(0, 68%, 57%);
+        --dark-danger-500: hsl(0, 68%, 67%);
+        --dark-danger-600: hsl(0, 68%, 77%);
+        --dark-danger-700: hsl(0, 68%, 87%);
+        --dark-danger-800: hsl(0, 68%, 97%);
+        --dark-danger-900: hsl(0, 68%, 100%);
+
+        --dark-accent: hsl(240, 55%, 55%);
+        --dark-foreground: hsl(0, 0%, 100%);
+
+        --dark-glow: rgba(177, 142, 223, 0.2);
+    }
+}
+
+::-webkit-scrollbar {
+    width: 7px;
+    background-color: rgb(32, 36, 39);
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: rgb(21, 77, 77);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: rgb(23, 98, 119);
+}
