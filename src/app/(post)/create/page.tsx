@@ -14,7 +14,7 @@ function Page() {
     if (!isSignedIn) router.push("/auth");
 
     return (
-        <section className="flex justify-center p-5 py-10">
+        <section className="flex justify-center p-5">
             <div className="w-full max-w-2xl">
                 <CreatePostPage user={user!} />
             </div>
