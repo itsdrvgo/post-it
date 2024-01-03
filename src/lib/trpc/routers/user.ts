@@ -1,3 +1,4 @@
+import { utapi } from "@/src/app/api/uploadthing/core";
 import { TRPCError } from "@trpc/server";
 import { compareSync, hashSync } from "bcryptjs";
 import { and, eq } from "drizzle-orm";
@@ -122,9 +123,30 @@ export const userRouter = createTRPCRouter({
         })
         .mutation(async ({ input, ctx }) => {
             const { id } = input;
-            const { db, users } = ctx;
+            const { db, users, posts } = ctx;
+
+            const postsData = await db.query.posts.findMany({
+                where: eq(posts.authorId, id),
+            });
+
+            if (postsData.length)
+                await Promise.all(
+                    postsData.map(async (post) => {
+                        if (post.attachments.length) {
+                            await utapi.deleteFiles(
+                                post.attachments
+                                    .filter(
+                                        (attachment) =>
+                                            attachment?.type !== "text"
+                                    )
+                                    .map((attachment) => attachment!.id)
+                            );
+                        }
+                    })
+                );
 
             await db.delete(users).where(eq(users.id, id));
+            await db.delete(posts).where(eq(posts.authorId, id));
 
             return {
                 success: true,

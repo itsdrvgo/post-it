@@ -1,3 +1,4 @@
+import { utapi } from "@/src/app/api/uploadthing/core";
 import { TRPCError } from "@trpc/server";
 import { eq, inArray } from "drizzle-orm";
 import { withCursorPagination } from "drizzle-pagination";
@@ -52,16 +53,18 @@ export const postRouter = createTRPCRouter({
     getInfinitePosts: publicProcedure
         .input(
             z.object({
+                userId: z.string().optional(),
                 cursor: z.string().nullish(),
                 limit: z.number().min(1).max(50).default(10),
             })
         )
         .query(async ({ input, ctx }) => {
-            const { cursor, limit } = input;
+            const { cursor, limit, userId } = input;
             const { db, posts, users } = ctx;
 
             const data = await db.query.posts.findMany(
                 withCursorPagination({
+                    where: userId ? eq(posts.authorId, userId) : undefined,
                     limit,
                     cursors: [
                         [
@@ -85,11 +88,16 @@ export const postRouter = createTRPCRouter({
                     )
                 );
 
+            const parsedAuthors = authors.map((author) => ({
+                ...author,
+                password: undefined,
+            }));
+
             return {
                 data: data.length
                     ? data.map((post) => ({
                           ...post,
-                          author: authors.find(
+                          author: parsedAuthors.find(
                               (author) => author.id === post.authorId
                           )!,
                       }))
@@ -151,12 +159,23 @@ export const postRouter = createTRPCRouter({
                 });
 
             return next({
-                ctx,
+                ctx: {
+                    ...ctx,
+                    post,
+                },
             });
         })
         .mutation(async ({ input, ctx }) => {
             const { id } = input;
-            const { db, posts } = ctx;
+            const { db, posts, post } = ctx;
+
+            if (post.attachments.length) {
+                await utapi.deleteFiles(
+                    post.attachments
+                        .filter((attachment) => attachment?.type !== "text")
+                        .map((attachment) => attachment!.id)
+                );
+            }
 
             await db.delete(posts).where(eq(posts.id, id));
 
