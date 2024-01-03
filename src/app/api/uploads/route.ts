@@ -4,6 +4,7 @@ import { utapi } from "../uploadthing/core";
 
 export async function POST(req: NextRequest) {
     const body = await req.formData();
+
     const images = body.getAll("image") as File[];
     if (!images?.length)
         return CResponse({
