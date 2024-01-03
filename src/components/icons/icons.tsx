@@ -58,6 +58,7 @@ import {
     Info,
     Instagram,
     Italic,
+    Key,
     Landmark,
     Laptop,
     Layers,
@@ -130,6 +131,7 @@ import {
 export type Icon = LucideIcon;
 
 export const Icons = {
+    key: Key,
     zoom: ZoomIn,
     fullscreen: Fullscreen,
     graduationHat: GraduationCap,

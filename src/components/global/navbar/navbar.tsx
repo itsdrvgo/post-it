@@ -19,12 +19,22 @@ import {
     NavbarMenuToggle,
     User,
 } from "@nextui-org/react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
+import toast from "react-hot-toast";
 import { useUser } from "../../providers/user";
 
 function Nav() {
-    const { isLoaded, user } = useUser();
+    const router = useRouter();
+
+    const { isLoaded, user, setUser } = useUser();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+    const handleLogout = () => {
+        setUser(null);
+        toast.success("See you soon!");
+        router.push("/auth");
+    };
 
     return (
         <Navbar
@@ -97,10 +107,18 @@ function Nav() {
                             </DropdownSection>
 
                             <DropdownSection aria-label="Actions">
-                                <DropdownItem key="create">
+                                <DropdownItem
+                                    key="create"
+                                    onPress={() => router.push("/create")}
+                                >
                                     Create a Post
                                 </DropdownItem>
-                                <DropdownItem key="logout">Logout</DropdownItem>
+                                <DropdownItem
+                                    key="logout"
+                                    onPress={handleLogout}
+                                >
+                                    Logout
+                                </DropdownItem>
                             </DropdownSection>
                         </DropdownMenu>
                     </Dropdown>

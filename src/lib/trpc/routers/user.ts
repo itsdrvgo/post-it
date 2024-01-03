@@ -1,5 +1,6 @@
 import { TRPCError } from "@trpc/server";
-import { eq } from "drizzle-orm";
+import { compareSync, hashSync } from "bcryptjs";
+import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 import { insertUserSchema, selectUserSchema } from "../../drizzle/schema";
 import { createTRPCRouter, publicProcedure } from "../trpc";
@@ -41,40 +42,62 @@ export const userRouter = createTRPCRouter({
             const { user } = ctx;
             return user;
         }),
-    createUser: publicProcedure
+    authenticateUser: publicProcedure
         .input(z.object(userCreateSchema.shape))
         .use(async ({ input, ctx, next }) => {
             const { username } = input;
             const { db, users } = ctx;
 
             const user = await db.query.users.findFirst({
-                where: eq(users.username, username),
+                where: and(eq(users.username, username)),
             });
-
-            if (user)
-                throw new TRPCError({
-                    code: "CONFLICT",
-                    message: "User already exists",
-                });
 
             return next({
-                ctx,
+                ctx: {
+                    ...ctx,
+                    user,
+                },
             });
         })
-        .mutation(async ({ input, ctx }) => {
-            const { username } = input;
+        .mutation(async ({ ctx, input }) => {
+            const { username, password } = input;
             const { db, users } = ctx;
+
+            if (ctx.user) {
+                const isPasswordValid = compareSync(
+                    password,
+                    ctx.user.password
+                );
+
+                if (!isPasswordValid)
+                    throw new TRPCError({
+                        code: "UNAUTHORIZED",
+                        message: "Invalid password",
+                    });
+
+                return {
+                    user: ctx.user,
+                    firstTimeLogin: false,
+                };
+            }
+
+            const hashedPassword = hashSync(password);
 
             await db.insert(users).values({
                 username,
+                password: hashedPassword,
             });
 
             const user = await db.query.users.findFirst({
-                where: eq(users.username, username),
+                where: and(
+                    eq(users.username, username),
+                    eq(users.password, hashedPassword)
+                ),
             });
 
             return {
                 user,
+                firstTimeLogin: true,
             };
         }),
     deleteUser: publicProcedure

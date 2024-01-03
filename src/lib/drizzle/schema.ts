@@ -22,6 +22,7 @@ export const users = mysqlTable("post_it__users", {
         .notNull()
         .$defaultFn(() => createId()),
     username: varchar("username", { length: 50 }).notNull().unique(),
+    password: text("password").notNull(),
     createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
