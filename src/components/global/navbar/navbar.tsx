@@ -22,6 +22,7 @@ import {
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import { Icons } from "../../icons/icons";
 import { useUser } from "../../providers/user";
 
 function Nav() {
@@ -81,6 +82,7 @@ function Nav() {
                     <Dropdown showArrow radius="sm">
                         <DropdownTrigger className="cursor-pointer">
                             <Avatar
+                                size="sm"
                                 src={DEFAULT_IMAGE_URL}
                                 alt={user.username}
                                 showFallback
@@ -106,15 +108,35 @@ function Nav() {
                                 </DropdownItem>
                             </DropdownSection>
 
-                            <DropdownSection aria-label="Actions">
+                            <DropdownSection aria-label="Posts" showDivider>
                                 <DropdownItem
                                     key="create"
+                                    startContent={
+                                        <Icons.add className="h-4 w-4" />
+                                    }
                                     onPress={() => router.push("/create")}
                                 >
                                     Create a Post
                                 </DropdownItem>
+
+                                <DropdownItem
+                                    key="your_posts"
+                                    startContent={
+                                        <Icons.dashboard className="h-4 w-4" />
+                                    }
+                                    onPress={() => router.push("/profile")}
+                                >
+                                    Your Posts
+                                </DropdownItem>
+                            </DropdownSection>
+
+                            <DropdownSection aria-label="Settings">
                                 <DropdownItem
                                     key="logout"
+                                    color="danger"
+                                    startContent={
+                                        <Icons.logout className="h-4 w-4" />
+                                    }
                                     onPress={handleLogout}
                                 >
                                     Logout
