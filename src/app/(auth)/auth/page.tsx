@@ -10,7 +10,12 @@ function Page() {
 
     const { isLoaded, isSignedIn, setUser } = useUser();
 
-    if (!isLoaded) return <Loader />;
+    if (!isLoaded)
+        return (
+            <section className="flex h-screen w-full items-center justify-center p-5">
+                <Loader />
+            </section>
+        );
     if (isSignedIn) router.push("/");
 
     return (
