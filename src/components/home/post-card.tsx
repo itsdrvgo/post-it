@@ -29,6 +29,7 @@ import {
     useDisclosure,
 } from "@nextui-org/react";
 import { createId } from "@paralleldrive/cuid2";
+import NextImage from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
@@ -252,10 +253,13 @@ function PostCard({ post, user, className, ...props }: PageProps) {
                                     className="overflow-hidden"
                                 >
                                     <Image
+                                        as={NextImage}
                                         src={attachment?.url}
                                         alt={attachment?.name}
                                         radius="sm"
                                         className="aspect-video cursor-pointer object-cover"
+                                        width={700}
+                                        height={700}
                                         onClick={() => {
                                             if (pathname === "/") return;
                                             setImage(attachment?.url ?? "");
