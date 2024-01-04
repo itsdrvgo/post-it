@@ -14,7 +14,7 @@ function Layout({ children }: RootLayoutProps) {
                 <p>
                     PLEASE DO NOT USE REAL PASSWORDS AS CREDENTIALS.{" "}
                     <Link
-                        href="https://github.com/itsdrvgo/post-it/blob/master/README.md#warning"
+                        href="https://github.com/itsdrvgo/post-it/blob/master/README.md#-warning-"
                         className="text-blue-200 underline"
                         target="_blank"
                     >
