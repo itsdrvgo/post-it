@@ -171,7 +171,10 @@ function PostCard({ post, user, className, ...props }: PageProps) {
 
                     <p className="text-sm md:text-base">
                         {post.content.split("\n").map((line, i) => (
-                            <span key={i}>{sanitizeContent(line)}</span>
+                            <span key={i}>
+                                {sanitizeContent(line)}
+                                <br />
+                            </span>
                         ))}
                     </p>
 
