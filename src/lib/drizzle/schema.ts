@@ -1,10 +1,12 @@
 import { init } from "@paralleldrive/cuid2";
 import { InferInsertModel, InferSelectModel, relations } from "drizzle-orm";
 import {
+    index,
     json,
     mysqlTable,
     text,
     timestamp,
+    uniqueIndex,
     varchar,
 } from "drizzle-orm/mysql-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
@@ -16,31 +18,48 @@ const createId = init({
 
 // SCHEMAS
 
-export const users = mysqlTable("post_it__users", {
-    id: varchar("id", { length: 25 })
-        .primaryKey()
-        .notNull()
-        .$defaultFn(() => createId()),
-    username: varchar("username", { length: 50 }).notNull().unique(),
-    password: text("password").notNull(),
-    createdAt: timestamp("created_at").notNull().defaultNow(),
-});
+export const users = mysqlTable(
+    "post_it__users",
+    {
+        id: varchar("id", { length: 25 })
+            .primaryKey()
+            .notNull()
+            .$defaultFn(() => createId()),
+        username: varchar("username", { length: 50 }).notNull().unique(),
+        password: text("password").notNull(),
+        createdAt: timestamp("created_at").notNull().defaultNow(),
+    },
+    (table) => {
+        return {
+            usernameIdx: uniqueIndex("username_idx").on(table.username),
+        };
+    }
+);
 
-export const posts = mysqlTable("post_it__posts", {
-    id: varchar("id", { length: 25 })
-        .primaryKey()
-        .notNull()
-        .$defaultFn(() => createId()),
-    content: text("content").notNull(),
-    metadata: json("metadata").$type<PostMetadata>().default(null),
-    attachments: json("attachments")
-        .$type<PostAttachment[]>()
-        .default([])
-        .notNull(),
-    createdAt: timestamp("created_at").notNull().defaultNow(),
-    updatedAt: timestamp("updated_at").notNull().onUpdateNow().defaultNow(),
-    authorId: varchar("author_id", { length: 50 }).notNull(),
-});
+export const posts = mysqlTable(
+    "post_it__posts",
+    {
+        id: varchar("id", { length: 25 })
+            .primaryKey()
+            .notNull()
+            .$defaultFn(() => createId()),
+        content: text("content").notNull(),
+        metadata: json("metadata").$type<PostMetadata>().default(null),
+        attachments: json("attachments")
+            .$type<PostAttachment[]>()
+            .default([])
+            .notNull(),
+        createdAt: timestamp("created_at").notNull().defaultNow(),
+        updatedAt: timestamp("updated_at").notNull().onUpdateNow().defaultNow(),
+        authorId: varchar("author_id", { length: 50 }).notNull(),
+    },
+    (table) => {
+        return {
+            authorIdIdx: index("author_id_idx").on(table.authorId),
+            createdAtIdx: index("created_at_idx").on(table.createdAt),
+        };
+    }
+);
 
 // RELATIONS
 
