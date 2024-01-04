@@ -1,7 +1,6 @@
 "use client";
 
 import { DEFAULT_IMAGE_URL } from "@/src/config/const";
-import { User } from "@/src/lib/drizzle/schema";
 import { trpc } from "@/src/lib/trpc/client";
 import { cn, handleClientError } from "@/src/lib/utils";
 import { DefaultProps } from "@/src/types";
@@ -22,11 +21,12 @@ import { useRouter } from "next/navigation";
 import { Dispatch, SetStateAction, useEffect, useMemo, useRef } from "react";
 import toast from "react-hot-toast";
 import PostCard from "../home/post-card";
+import { SafeUser } from "../providers/user";
 import Loader from "../ui/loader";
 
 interface PageProps extends DefaultProps {
-    user: User;
-    setUser: Dispatch<SetStateAction<User | null>>;
+    user: SafeUser;
+    setUser: Dispatch<SetStateAction<SafeUser | null>>;
 }
 
 function ProfilePage({ user, setUser, className, ...props }: PageProps) {
