@@ -19,7 +19,7 @@ import {
     NavbarMenuToggle,
     User,
 } from "@nextui-org/react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { Icons } from "../../icons/icons";
@@ -27,6 +27,7 @@ import { useUser } from "../../providers/user";
 
 function Nav() {
     const router = useRouter();
+    const pathname = usePathname();
 
     const { isLoaded, user, setUser } = useUser();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -39,13 +40,14 @@ function Nav() {
 
     return (
         <Navbar
+            isMenuOpen={isMenuOpen}
             shouldHideOnScroll
             onMenuOpenChange={setIsMenuOpen}
             classNames={{
                 base: "border-b border-white/10",
             }}
         >
-            <NavbarContent>
+            <NavbarContent justify="start">
                 <NavbarMenuToggle
                     aria-label={isMenuOpen ? "Close menu" : "Open menu"}
                     className="sm:hidden"
@@ -144,15 +146,20 @@ function Nav() {
                             </DropdownSection>
                         </DropdownMenu>
                     </Dropdown>
-                ) : (
-                    <></>
-                )}
+                ) : null}
             </NavbarContent>
 
             <NavbarMenu>
                 {menu.map((item) => (
                     <NavbarMenuItem key={item.href}>
-                        <Link href={item.href} color="foreground">
+                        <Link
+                            href={item.href}
+                            color="foreground"
+                            onPress={() => {
+                                if (pathname === item.href)
+                                    setIsMenuOpen(false);
+                            }}
+                        >
                             {item.name}
                         </Link>
                     </NavbarMenuItem>
