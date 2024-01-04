@@ -35,13 +35,15 @@ export function EmptyPlaceholder({
             className={cn("gap-3 py-10", className)}
             fullWidth
             classNames={{
-                base: isBackgroundVisible ? "bg-default-50 shadow-md" : "bg-transparent shadow-none",
+                base: isBackgroundVisible
+                    ? "bg-default-50 shadow-md"
+                    : "bg-transparent shadow-none",
             }}
             {...props}
         >
             {Icon && (
                 <CardHeader className="items-center justify-center">
-                    <div className="rounded-full bg-primary-200 p-5">
+                    <div className="rounded-full bg-secondary p-5">
                         <div>
                             <Icon />
                         </div>
@@ -50,7 +52,9 @@ export function EmptyPlaceholder({
             )}
             <CardBody className="flex flex-col items-center gap-4 text-center">
                 <p className="text-2xl font-bold">{title}</p>
-                <p className="max-w-xs text-sm text-gray-400">{description}</p>
+                <p className="max-w-xs text-balance text-sm text-gray-400">
+                    {description}
+                </p>
             </CardBody>
 
             {endContent && (
