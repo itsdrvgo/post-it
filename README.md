@@ -6,9 +6,13 @@ A simple rip-off of social media apps like Twitter, Facebook, Instagram, etc. Th
 
 ## !! ⚠ Warning !!
 
-```
-PLEASE DO NOT ENTER YOUR REAL PASSWORDS IN THE APP. EVEN THOUGH THE PASSWORDS ARE HASHED, IT IS NOT SAFE TO ENTER YOUR REAL PASSWORDS. THIS IS JUST A PROJECT TO LEARN, WE ARE NOT RESPONSIBLE FOR ANY DATA LEAKS.
-```
+-   **PLEASE DO NOT ENTER YOUR REAL PASSWORDS IN THE APP.** Even though the passwords are hashed, it is not safe to enter your real passwords. This is just a project to learn, we are not responsible for any data leaks.
+
+-   **WE DO NOT REGULATE THE CONTENT POSTED BY THE USERS.** We are not responsible for any content posted by the users.
+
+-   **WE DO NOT STORE ANY PERSONAL DATA.** We only store the username and the hashed password in the database. We do not store any other data.
+
+-   **WE DO NOT USE COOKIES.** We do not use cookies to store any data. We only store the username and the hashed password in the browser's local storage.
 
 ## Tech Stack
 
