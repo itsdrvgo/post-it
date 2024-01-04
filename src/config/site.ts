@@ -2,29 +2,15 @@ import { SiteConfig } from "../types";
 
 export const siteConfig: SiteConfig = {
     name: "Post It",
-    description:
-        "Vercel is the best place to deploy any frontend app. Start by deploying with zero configuration to our global edge network.",
-    url: "https://vercel.com",
+    description: "Post whatever you want, whenever you want.",
+    url: "https://post-it-itsdrvgo.vercel.app/",
     ogImage: "/og.webp",
-    keywords: [
-        "vercel",
-        "zeit",
-        "deploy",
-        "hosting",
-        "serverless",
-        "cloud",
-        "functions",
-        "edge",
-        "cdn",
-        "static",
-        "jamstack",
-        "next",
-    ],
+    keywords: ["next", "postit", "itsdrvgo", "peeramp", "drvgo", "post"],
     links: {
-        youtube: "",
-        instagram: "",
-        twitter: "",
-        github: "",
-        discord: "",
+        youtube: "https://youtube.com/@itsdrvgodev",
+        instagram: "https://instagram.com/itsdrvgo",
+        twitter: "https://x.com/itsdrvgo",
+        github: "https://github.com/itsdrvgo",
+        discord: "https://dsc.gg/drvgo",
     },
 };
