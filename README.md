@@ -2,6 +2,8 @@
 
 A simple rip-off of social media apps like Twitter, Facebook, Instagram, etc. This is a project to learn the basics of `Next.JS`, `React`, `TailwindCSS` & `Drizzle ORM`.
 
+![og](public/og.webp)
+
 ## !! ⚠ Warning !!
 
 ```
