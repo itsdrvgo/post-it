@@ -2,7 +2,6 @@
 
 import { DEFAULT_IMAGE_URL } from "@/src/config/const";
 import { UploadEvent, useDropzone } from "@/src/hooks/useDropzone";
-import { User } from "@/src/lib/drizzle/schema";
 import { trpc } from "@/src/lib/trpc/client";
 import {
     cFetch,
@@ -14,16 +13,17 @@ import {
 import { ResponseData } from "@/src/lib/validation/response";
 import { DefaultProps } from "@/src/types";
 import { Avatar, Button, Image, Spinner, Textarea } from "@nextui-org/react";
+import { createId } from "@paralleldrive/cuid2";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import LiteYouTubeEmbed from "react-lite-youtube-embed";
-import { Icons } from "../../icons/icons";
 import "react-lite-youtube-embed/dist/LiteYouTubeEmbed.css";
-import { createId } from "@paralleldrive/cuid2";
-import { useRouter } from "next/navigation";
+import { Icons } from "../../icons/icons";
+import { SafeUser } from "../../providers/user";
 
 interface PageProps extends DefaultProps {
-    user: User;
+    user: SafeUser;
 }
 
 function CreatePostPage({ user, className, ...props }: PageProps) {

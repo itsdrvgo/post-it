@@ -79,7 +79,11 @@ export const postRouter = createTRPCRouter({
             if (!data.length) return { data: [], nextCursor: null };
 
             const authors = await db
-                .select()
+                .select({
+                    id: users.id,
+                    username: users.username,
+                    createdAt: users.createdAt,
+                })
                 .from(users)
                 .where(
                     inArray(
@@ -88,16 +92,11 @@ export const postRouter = createTRPCRouter({
                     )
                 );
 
-            const parsedAuthors = authors.map((author) => ({
-                ...author,
-                password: undefined,
-            }));
-
             return {
                 data: data.length
                     ? data.map((post) => ({
                           ...post,
-                          author: parsedAuthors.find(
+                          author: authors.find(
                               (author) => author.id === post.authorId
                           )!,
                       }))

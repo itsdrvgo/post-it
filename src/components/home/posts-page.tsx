@@ -1,6 +1,5 @@
 "use client";
 
-import { User } from "@/src/lib/drizzle/schema";
 import { trpc } from "@/src/lib/trpc/client";
 import { cn } from "@/src/lib/utils";
 import { DefaultProps } from "@/src/types";
@@ -8,11 +7,12 @@ import { useIntersection } from "@mantine/hooks";
 import { Divider, Spinner } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef } from "react";
+import { SafeUser } from "../providers/user";
 import Loader from "../ui/loader";
 import PostCard from "./post-card";
 
 interface PageProps extends DefaultProps {
-    user: User;
+    user: SafeUser;
 }
 
 function PostsPage({ user, className, ...props }: PageProps) {

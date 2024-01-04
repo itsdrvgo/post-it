@@ -9,11 +9,13 @@ import {
     useState,
 } from "react";
 
+export type SafeUser = Omit<User, "password">;
+
 type UserContextProps = {
-    user: User | null;
+    user: SafeUser | null;
     isSignedIn: boolean;
     isLoaded: boolean;
-    setUser: Dispatch<SetStateAction<User | null>>;
+    setUser: Dispatch<SetStateAction<SafeUser | null>>;
 };
 
 const UserContext = createContext<UserContextProps>({
@@ -31,7 +33,7 @@ export const useUser = () => {
 const LOCAL_STORAGE_KEY = "post_it__user";
 
 function UserProvider({ children }: { children: ReactNode }) {
-    const [user, setUser] = useState<User | null>(() => {
+    const [user, setUser] = useState<SafeUser | null>(() => {
         if (typeof window !== "undefined") {
             const savedUser = localStorage.getItem(LOCAL_STORAGE_KEY);
             return savedUser ? JSON.parse(savedUser) : null;

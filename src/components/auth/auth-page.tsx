@@ -1,6 +1,5 @@
 "use client";
 
-import { User } from "@/src/lib/drizzle/schema";
 import { trpc } from "@/src/lib/trpc/client";
 import { handleClientError } from "@/src/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -20,6 +19,7 @@ import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { z } from "zod";
 import { Icons } from "../icons/icons";
+import { SafeUser } from "../providers/user";
 import {
     Form,
     FormControl,
@@ -43,11 +43,10 @@ const signinSchema = z.object({
 type SignInData = z.infer<typeof signinSchema>;
 
 interface PageProps {
-    user: User | null;
-    setUser: Dispatch<SetStateAction<User | null>>;
+    setUser: Dispatch<SetStateAction<SafeUser | null>>;
 }
 
-function AuthPage({ user, setUser }: PageProps) {
+function AuthPage({ setUser }: PageProps) {
     const router = useRouter();
 
     const [password, setPassword] = useState("");
@@ -87,11 +86,7 @@ function AuthPage({ user, setUser }: PageProps) {
     const onSubmit = (data: SignInData) => {
         const { username } = data;
 
-        const uPassword = user
-            ? user.password
-            : data.password.length > 0
-              ? data.password
-              : password;
+        const uPassword = data.password.length > 0 ? data.password : password;
 
         return authenticateUser({ username, password: uPassword });
     };

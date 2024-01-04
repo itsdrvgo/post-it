@@ -1,7 +1,8 @@
 "use client";
 
 import { DEFAULT_IMAGE_URL } from "@/src/config/const";
-import { Post, User } from "@/src/lib/drizzle/schema";
+import { Post } from "@/src/lib/drizzle/schema";
+import { trpc } from "@/src/lib/trpc/client";
 import {
     cn,
     convertMstoTimeElapsed,
@@ -28,20 +29,20 @@ import {
     useDisclosure,
 } from "@nextui-org/react";
 import { createId } from "@paralleldrive/cuid2";
-import { Icons } from "../icons/icons";
-import "react-lite-youtube-embed/dist/LiteYouTubeEmbed.css";
-import { trpc } from "@/src/lib/trpc/client";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import LiteYouTubeEmbed from "react-lite-youtube-embed";
+import "react-lite-youtube-embed/dist/LiteYouTubeEmbed.css";
 import ImageViewModal from "../global/modals/image-view-modal";
+import { Icons } from "../icons/icons";
+import { SafeUser } from "../providers/user";
 
 interface PageProps extends DefaultProps {
     post: Post & {
-        author: Omit<User, "password">;
+        author: SafeUser;
     };
-    user: User;
+    user: SafeUser;
 }
 
 function PostCard({ post, user, className, ...props }: PageProps) {
