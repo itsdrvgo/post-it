@@ -1,45 +1,47 @@
 "use client";
 
-import { DEFAULT_IMAGE_URL } from "@/src/config/const";
-import { trpc } from "@/src/lib/trpc/client";
-import { cn, handleClientError } from "@/src/lib/utils";
-import { DefaultProps } from "@/src/types";
-import { useIntersection } from "@mantine/hooks";
+import { DEFAULT_IMAGE_URL } from "@/config/const";
+import { trpc } from "@/lib/trpc/client";
 import {
-    Avatar,
-    Button,
-    Divider,
-    Modal,
-    ModalBody,
-    ModalContent,
-    ModalFooter,
-    ModalHeader,
-    Spinner,
-    useDisclosure,
-} from "@nextui-org/react";
+    cn,
+    getAccessToken,
+    handleClientError,
+    handleError,
+} from "@/lib/utils";
+import { UserClientData } from "@/lib/validation/user";
+import { GenericProps } from "@/types";
+import { useIntersection } from "@mantine/hooks";
 import { useRouter } from "next/navigation";
-import { Dispatch, SetStateAction, useEffect, useMemo, useRef } from "react";
-import toast from "react-hot-toast";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { toast } from "sonner";
 import PostCard from "../home/post-card";
-import { SafeUser } from "../providers/user";
+import { setToken } from "../providers/client";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { Button } from "../ui/button";
+import { Card, CardContent } from "../ui/card";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "../ui/dialog";
+import { Link } from "../ui/link";
 import Loader from "../ui/loader";
+import { Separator } from "../ui/separator";
 
-interface PageProps extends DefaultProps {
-    user: SafeUser;
-    setUser: Dispatch<SetStateAction<SafeUser | null>>;
+interface PageProps extends GenericProps {
+    user: UserClientData;
 }
 
-function ProfilePage({ user, setUser, className, ...props }: PageProps) {
+function ProfilePage({ className, user, ...props }: PageProps) {
     const router = useRouter();
+    const [isAccountDeleteModalOpen, setIsAccountDeleteModalOpen] =
+        useState(false);
 
-    const {
-        isOpen: isAccountDeleteModalOpen,
-        onOpen: onAccountDeleteModalOpen,
-        onClose: onAccountDeleteModalClose,
-        onOpenChange: onAccountDeleteModalOpenChange,
-    } = useDisclosure();
-
-    const { mutate: deleteUser, isLoading: isUserDeleting } =
+    const { mutate: deleteUser, isPending: isUserDeleting } =
         trpc.users.deleteUser.useMutation({
             onMutate: () => {
                 const toastId = toast.loading("Deleting account...");
@@ -47,10 +49,10 @@ function ProfilePage({ user, setUser, className, ...props }: PageProps) {
             },
             onSuccess: (_, __, ctx) => {
                 toast.success("Account deleted successfully!", {
-                    id: ctx?.toastId,
+                    id: ctx.toastId,
                 });
-                setUser(null);
-                onAccountDeleteModalClose();
+
+                setIsAccountDeleteModalOpen(false);
                 router.push("/auth");
             },
             onError: (err, _, ctx) => {
@@ -72,7 +74,7 @@ function ProfilePage({ user, setUser, className, ...props }: PageProps) {
         }
     );
 
-    const viewportRef = useRef<HTMLDivElement>(null);
+    const viewportRef = useRef<HTMLAnchorElement>(null);
     const { entry, ref } = useIntersection({
         root: viewportRef.current,
         threshold: 1,
@@ -93,149 +95,148 @@ function ProfilePage({ user, setUser, className, ...props }: PageProps) {
         [postsRaw]
     );
 
+    const handleDeleteUser = async () => {
+        try {
+            const token = await getAccessToken();
+            setToken(token);
+
+            deleteUser();
+        } catch (err) {
+            return handleError(err);
+        } finally {
+            setIsAccountDeleteModalOpen(false);
+        }
+    };
+
     return (
-        <>
-            <div
-                className={cn("w-full max-w-2xl space-y-5", className)}
-                {...props}
-            >
-                <div className="flex items-center justify-between rounded-lg border border-primary bg-default-100 p-4">
+        <div className={cn("w-full max-w-2xl space-y-5", className)} {...props}>
+            <Card>
+                <CardContent className="flex items-center justify-between pt-6">
                     <div className="flex items-center gap-3">
-                        <Avatar
-                            src={DEFAULT_IMAGE_URL}
-                            alt={user.username}
-                            showFallback
-                        />
+                        <Avatar>
+                            <AvatarImage
+                                src={DEFAULT_IMAGE_URL}
+                                alt={user.username}
+                            />
+                            <AvatarFallback>
+                                {user.username[0].toUpperCase()}
+                            </AvatarFallback>
+                        </Avatar>
 
                         <p className="text-sm">@{user.username}</p>
                     </div>
 
                     <div>
-                        <Button
-                            color="danger"
-                            size="sm"
-                            radius="sm"
-                            onPress={onAccountDeleteModalOpen}
+                        <Dialog
+                            open={isAccountDeleteModalOpen}
+                            onOpenChange={setIsAccountDeleteModalOpen}
                         >
-                            Delete Account
-                        </Button>
+                            <DialogTrigger asChild>
+                                <Button variant="destructive" size="sm">
+                                    Delete Account
+                                </Button>
+                            </DialogTrigger>
+
+                            <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle>Delete Account</DialogTitle>
+                                    <DialogDescription>
+                                        Are you sure you want to delete your
+                                        account? This action is irreversible.
+                                    </DialogDescription>
+                                </DialogHeader>
+
+                                <DialogFooter className="justify-end gap-2">
+                                    <Button
+                                        size="sm"
+                                        variant="outline"
+                                        isDisabled={isUserDeleting}
+                                        type="button"
+                                        onClick={() =>
+                                            setIsAccountDeleteModalOpen(false)
+                                        }
+                                    >
+                                        Cancel
+                                    </Button>
+
+                                    <Button
+                                        size="sm"
+                                        variant="destructive"
+                                        isDisabled={isUserDeleting}
+                                        isLoading={isUserDeleting}
+                                        onClick={handleDeleteUser}
+                                    >
+                                        Delete Account
+                                    </Button>
+                                </DialogFooter>
+                            </DialogContent>
+                        </Dialog>
                     </div>
-                </div>
+                </CardContent>
+            </Card>
 
-                <Divider />
+            <Separator />
 
-                <div className="space-y-4">
-                    {isLoading ? (
-                        <div className="flex justify-center">
-                            <Loader />
-                        </div>
-                    ) : !!posts.length ? (
-                        <>
-                            {posts.map((post, i) => (
-                                <>
-                                    {i === posts.length - 1 ? (
-                                        <div
-                                            ref={ref}
-                                            key={post.id}
-                                            className="cursor-pointer"
-                                            onClick={() =>
-                                                router.push(
-                                                    `/posts?p=${post.id}`
-                                                )
-                                            }
-                                        >
-                                            <PostCard post={post} user={user} />
-                                        </div>
-                                    ) : (
-                                        <div
-                                            key={post.id}
-                                            className="cursor-pointer"
-                                            onClick={() =>
-                                                router.push(
-                                                    `/posts?p=${post.id}`
-                                                )
-                                            }
-                                        >
-                                            <PostCard post={post} user={user} />
-                                        </div>
-                                    )}
+            <div className="space-y-4">
+                {isLoading ? (
+                    <div className="flex justify-center">
+                        <Loader />
+                    </div>
+                ) : !!posts.length ? (
+                    <>
+                        {posts.map((post, i) => (
+                            <>
+                                {i === posts.length - 1 ? (
+                                    <Link
+                                        type="link"
+                                        ref={ref}
+                                        key={post.id}
+                                        className="w-full"
+                                        href={`/posts?p=${post.id}`}
+                                    >
+                                        <PostCard post={post} user={user} />
+                                    </Link>
+                                ) : (
+                                    <Link
+                                        type="link"
+                                        key={post.id}
+                                        className="w-full"
+                                        href={`/posts?p=${post.id}`}
+                                    >
+                                        <PostCard post={post} user={user} />
+                                    </Link>
+                                )}
 
-                                    <Divider />
-                                </>
-                            ))}
+                                <Separator />
+                            </>
+                        ))}
 
-                            {isFetchingNextPage && (
-                                <div className="flex justify-center">
-                                    <Spinner />
+                        {isFetchingNextPage && (
+                            <div className="flex justify-center">
+                                <Loader />
+                            </div>
+                        )}
+
+                        {!isFetchingNextPage &&
+                            postsRaw?.pages.length &&
+                            !postsRaw.pages[postsRaw.pages.length - 1]
+                                .nextCursor && (
+                                <div className="text-center opacity-60">
+                                    <p className="text-xs md:text-sm">
+                                        No more posts to load
+                                    </p>
                                 </div>
                             )}
-
-                            {!isFetchingNextPage &&
-                                postsRaw?.pages.length &&
-                                !postsRaw.pages[postsRaw.pages.length - 1]
-                                    .nextCursor && (
-                                    <div className="text-center opacity-60">
-                                        <p className="text-xs md:text-sm">
-                                            No more posts to load
-                                        </p>
-                                    </div>
-                                )}
-                        </>
-                    ) : (
-                        <div className="flex justify-center">
-                            <p className="text-sm text-white/60">
-                                No posts to show
-                            </p>
-                        </div>
-                    )}
-                </div>
+                    </>
+                ) : (
+                    <div className="flex justify-center">
+                        <p className="text-sm text-white/60">
+                            No posts to show
+                        </p>
+                    </div>
+                )}
             </div>
-
-            <Modal
-                isOpen={isAccountDeleteModalOpen}
-                onOpenChange={onAccountDeleteModalOpenChange}
-                onClose={onAccountDeleteModalClose}
-            >
-                <ModalContent>
-                    {(close) => (
-                        <>
-                            <ModalHeader>Delete Account</ModalHeader>
-
-                            <ModalBody>
-                                Are you sure you want to delete your account?
-                                This action is irreversible.
-                            </ModalBody>
-
-                            <ModalFooter>
-                                <Button
-                                    radius="sm"
-                                    variant="light"
-                                    isDisabled={isUserDeleting}
-                                    onPress={close}
-                                >
-                                    Cancel
-                                </Button>
-
-                                <Button
-                                    color="primary"
-                                    variant="faded"
-                                    radius="sm"
-                                    isDisabled={isUserDeleting}
-                                    isLoading={isUserDeleting}
-                                    onPress={() =>
-                                        deleteUser({
-                                            id: user.id,
-                                        })
-                                    }
-                                >
-                                    Delete
-                                </Button>
-                            </ModalFooter>
-                        </>
-                    )}
-                </ModalContent>
-            </Modal>
-        </>
+        </div>
     );
 }
 

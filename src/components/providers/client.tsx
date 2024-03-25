@@ -1,33 +1,34 @@
 "use client";
 
-import { trpc } from "@/src/lib/trpc/client";
-import { cn } from "@/src/lib/utils";
-import { DefaultProps } from "@/src/types";
-import { NextUIProvider } from "@nextui-org/react";
+import { trpc } from "@/lib/trpc/client";
+import { getAbsoluteURL } from "@/lib/utils";
+import { LayoutProps } from "@/types";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { httpBatchLink, loggerLink } from "@trpc/react-query";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import superjson from "superjson";
-import UserProvider from "./user";
 
-const getBaseUrl = () => {
-    if (typeof window !== "undefined") return "";
-    if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
-    return `http://localhost:${process.env.PORT ?? 3000}`;
+export let token: string;
+
+export const setToken = (newToken: string) => {
+    token = newToken;
 };
 
-function ClientProvider({ children, className, ...props }: DefaultProps) {
-    const router = useRouter();
+function ClientProvider({ children }: LayoutProps) {
     const [queryClient] = useState(() => new QueryClient());
 
     const [trpcClient] = useState(() =>
         trpc.createClient({
-            transformer: superjson,
             links: [
                 httpBatchLink({
-                    url: `${getBaseUrl()}/api/trpc`,
+                    url: getAbsoluteURL("/api/trpc"),
+                    transformer: superjson,
+                    headers: () => {
+                        return {
+                            Authorization: `Bearer ${token}`,
+                        };
+                    },
                 }),
                 loggerLink({
                     enabled: (opts) =>
@@ -40,18 +41,13 @@ function ClientProvider({ children, className, ...props }: DefaultProps) {
     );
 
     return (
-        <NextUIProvider navigate={router.push}>
-            <trpc.Provider client={trpcClient} queryClient={queryClient}>
-                <QueryClientProvider client={queryClient}>
-                    <UserProvider>
-                        <body className={cn(className)} {...props}>
-                            {children}
-                        </body>
-                    </UserProvider>
-                    <ReactQueryDevtools />
-                </QueryClientProvider>
-            </trpc.Provider>
-        </NextUIProvider>
+        <trpc.Provider client={trpcClient} queryClient={queryClient}>
+            <QueryClientProvider client={queryClient}>
+                {children}
+
+                <ReactQueryDevtools />
+            </QueryClientProvider>
+        </trpc.Provider>
     );
 }
 

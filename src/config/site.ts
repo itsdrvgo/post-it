@@ -3,7 +3,6 @@ import { SiteConfig } from "../types";
 export const siteConfig: SiteConfig = {
     name: "Post It",
     description: "Post whatever you want, whenever you want.",
-    url: "https://post-it-itsdrvgo.vercel.app/",
     ogImage: "/og.webp",
     keywords: ["next", "postit", "itsdrvgo", "peeramp", "drvgo", "post"],
     links: {

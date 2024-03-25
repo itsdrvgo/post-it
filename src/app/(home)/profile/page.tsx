@@ -1,4 +1,4 @@
-import ProfileFetch from "@/src/components/profile/profile-fetch";
+import ProfileFetch from "@/components/profile/profile-fetch";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {

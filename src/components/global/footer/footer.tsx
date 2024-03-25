@@ -1,5 +1,5 @@
-import { cn } from "@/src/lib/utils";
-import Link from "next/link";
+import { Link } from "@/components/ui/link";
+import { cn } from "@/lib/utils";
 import { DetailedHTMLProps, HTMLAttributes } from "react";
 import Warning from "../404/warning";
 import Vercel from "../svgs/Vercel";
@@ -14,15 +14,19 @@ function Footer({
 
             <footer
                 className={cn(
-                    "flex justify-center border-t border-white/10 p-5",
+                    "flex justify-center border-t border-border/10 p-5",
                     className
                 )}
                 {...props}
             >
                 <div className="flex w-full max-w-5xl flex-col items-center justify-center gap-2 md:flex-row md:justify-between">
-                    <p className="text-sm text-white/60">
+                    <p className="text-sm text-muted-foreground">
                         &copy; {new Date().getFullYear()}{" "}
-                        <Link href="https://itsdrvgo.me" className="underline">
+                        <Link
+                            type="link"
+                            href="https://itsdrvgo.me"
+                            className="underline"
+                        >
                             DRVGO
                         </Link>
                         . All rights reserved.

@@ -3,20 +3,15 @@ import { HTMLAttributes, ReactNode } from "react";
 export type SiteConfig = {
     name: string;
     description: string;
-    url: string;
     ogImage: string;
-    keywords: string[];
-    links: {
-        youtube: string;
-        instagram: string;
-        twitter: string;
-        github: string;
-        discord: string;
+    keywords?: string[];
+    links?: {
+        [key: string]: string;
     };
 };
 
-export type DefaultProps = HTMLAttributes<HTMLElement>;
-export interface RootLayoutProps {
+export type GenericProps = HTMLAttributes<HTMLElement>;
+export interface LayoutProps {
     children: ReactNode;
 }
 

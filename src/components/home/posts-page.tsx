@@ -1,23 +1,21 @@
 "use client";
 
-import { trpc } from "@/src/lib/trpc/client";
-import { cn } from "@/src/lib/utils";
-import { DefaultProps } from "@/src/types";
+import { trpc } from "@/lib/trpc/client";
+import { cn } from "@/lib/utils";
+import { UserClientData } from "@/lib/validation/user";
+import { GenericProps } from "@/types";
 import { useIntersection } from "@mantine/hooks";
-import { Divider, Spinner } from "@nextui-org/react";
-import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef } from "react";
-import { SafeUser } from "../providers/user";
+import { Link } from "../ui/link";
 import Loader from "../ui/loader";
+import { Separator } from "../ui/separator";
 import PostCard from "./post-card";
 
-interface PageProps extends DefaultProps {
-    user: SafeUser;
+interface PageProps extends GenericProps {
+    user: UserClientData;
 }
 
 function PostsPage({ user, className, ...props }: PageProps) {
-    const router = useRouter();
-
     const {
         data: postsRaw,
         isLoading,
@@ -62,35 +60,33 @@ function PostsPage({ user, className, ...props }: PageProps) {
                     {posts.map((post, i) => (
                         <>
                             {i === posts.length - 1 ? (
-                                <div
+                                <Link
+                                    type="link"
                                     ref={ref}
                                     key={post.id}
-                                    className="cursor-pointer"
-                                    onClick={() =>
-                                        router.push(`/posts?p=${post.id}`)
-                                    }
+                                    className="w-full"
+                                    href={`/posts?p=${post.id}`}
                                 >
                                     <PostCard post={post} user={user} />
-                                </div>
+                                </Link>
                             ) : (
-                                <div
+                                <Link
+                                    type="link"
                                     key={post.id}
-                                    className="cursor-pointer"
-                                    onClick={() =>
-                                        router.push(`/posts?p=${post.id}`)
-                                    }
+                                    className="w-full"
+                                    href={`/posts?p=${post.id}`}
                                 >
                                     <PostCard post={post} user={user} />
-                                </div>
+                                </Link>
                             )}
 
-                            <Divider />
+                            <Separator />
                         </>
                     ))}
 
                     {isFetchingNextPage && (
                         <div className="flex justify-center">
-                            <Spinner />
+                            <Loader />
                         </div>
                     )}
 

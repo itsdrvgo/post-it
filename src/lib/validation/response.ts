@@ -16,11 +16,11 @@ export const responseMessages = z.union([
     z.literal("NOT_IMPLEMENTED"),
     z.literal("CREATED"),
     z.literal("BAD_GATEWAY"),
+    z.literal("CONFLICT"),
 ]);
 
 const responseSchema = <DataType extends z.ZodTypeAny>(dataType: DataType) =>
     z.object({
-        code: z.number(),
         message: responseMessages,
         longMessage: z.string().optional(),
         data: dataType.optional(),

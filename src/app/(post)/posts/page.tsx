@@ -1,9 +1,9 @@
-import NoPostPage from "@/src/components/global/404/no-post";
-import PostFetch from "@/src/components/post/view/post-fetch";
-import Loader from "@/src/components/ui/loader";
-import { siteConfig } from "@/src/config/site";
-import { db } from "@/src/lib/drizzle";
-import { posts } from "@/src/lib/drizzle/schema";
+import NoPostPage from "@/components/global/404/no-post";
+import PostFetch from "@/components/post/view/post-fetch";
+import Loader from "@/components/ui/loader";
+import { siteConfig } from "@/config/site";
+import { db } from "@/lib/drizzle";
+import { posts } from "@/lib/drizzle/schema";
 import { eq } from "drizzle-orm";
 import { Metadata } from "next";
 import { Suspense } from "react";

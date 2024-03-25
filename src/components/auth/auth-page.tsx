@@ -1,25 +1,24 @@
 "use client";
 
-import { trpc } from "@/src/lib/trpc/client";
-import { handleClientError } from "@/src/lib/utils";
+import { trpc } from "@/lib/trpc/client";
+import { handleClientError } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-    Button,
-    Card,
-    CardBody,
-    CardFooter,
-    CardHeader,
-    Input,
-    Tooltip,
-} from "@nextui-org/react";
 import { generate } from "generate-password";
 import { useRouter } from "next/navigation";
-import { Dispatch, SetStateAction, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import { z } from "zod";
 import { Icons } from "../icons/icons";
-import { SafeUser } from "../providers/user";
+import { Button } from "../ui/button";
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from "../ui/card";
 import {
     Form,
     FormControl,
@@ -28,6 +27,13 @@ import {
     FormLabel,
     FormMessage,
 } from "../ui/form";
+import { Input } from "../ui/input";
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "../ui/tooltip";
 
 const signinSchema = z.object({
     username: z
@@ -50,11 +56,7 @@ const signinSchema = z.object({
 
 type SignInData = z.infer<typeof signinSchema>;
 
-interface PageProps {
-    setUser: Dispatch<SetStateAction<SafeUser | null>>;
-}
-
-function AuthPage({ setUser }: PageProps) {
+function AuthPage() {
     const router = useRouter();
 
     const [password, setPassword] = useState("");
@@ -67,23 +69,22 @@ function AuthPage({ setUser }: PageProps) {
         },
     });
 
-    const { mutate: authenticateUser, isLoading } =
+    const { mutate: authenticateUser, isPending } =
         trpc.users.authenticateUser.useMutation({
             onMutate: () => {
                 const toastId = toast.loading("Authenticating...");
                 return { toastId };
             },
-            onSuccess: (data, _, ctx) => {
+            onSuccess: ({ user }, _, ctx) => {
                 navigator.clipboard.writeText(password);
                 toast.success(
-                    data.firstTimeLogin
+                    user.isFirstTime
                         ? "Welcome to PostIT, your account has been created!"
                         : "Welcome back!",
                     {
                         id: ctx?.toastId,
                     }
                 );
-                if (data.user) setUser(data.user);
                 router.push("/");
             },
             onError: (err, _, ctx) => {
@@ -93,9 +94,7 @@ function AuthPage({ setUser }: PageProps) {
 
     const onSubmit = (data: SignInData) => {
         const { username } = data;
-
         const uPassword = data.password.length > 0 ? data.password : password;
-
         return authenticateUser({ username, password: uPassword });
     };
 
@@ -109,6 +108,7 @@ function AuthPage({ setUser }: PageProps) {
         setPassword(generatedPassword);
         form.setValue("password", generatedPassword);
         navigator.clipboard.writeText(generatedPassword);
+
         toast.success(
             "Your generated password has been copied to clipboard, please save it somewhere safe",
             {
@@ -118,27 +118,21 @@ function AuthPage({ setUser }: PageProps) {
     };
 
     return (
-        <Card
-            classNames={{
-                header: "px-5 pt-4 pb-2",
-                body: "px-5 py-2",
-                footer: "px-5 pt-2 pb-4",
-            }}
-        >
+        <Card>
             <CardHeader>
-                <div className="space-y-2">
-                    <h1 className="text-3xl font-bold">Authentication</h1>
-                    <p className="text-sm text-white/60">
-                        Enter your credentials to continue
-                    </p>
-                </div>
+                <CardTitle className="text-3xl font-bold">
+                    Authentication
+                </CardTitle>
+                <CardDescription>
+                    Enter your credentials to continue
+                </CardDescription>
             </CardHeader>
 
             <Form {...form}>
                 <form
                     onSubmit={(...args) => form.handleSubmit(onSubmit)(...args)}
                 >
-                    <CardBody className="gap-4">
+                    <CardContent className="space-y-2">
                         <FormField
                             control={form.control}
                             name="username"
@@ -147,8 +141,6 @@ function AuthPage({ setUser }: PageProps) {
                                     <FormLabel>Username</FormLabel>
                                     <FormControl>
                                         <Input
-                                            size="sm"
-                                            radius="sm"
                                             placeholder="itsdrvgo"
                                             {...field}
                                             onChange={(e) => {
@@ -172,46 +164,50 @@ function AuthPage({ setUser }: PageProps) {
                                     <FormControl>
                                         <div className="relative">
                                             <Input
-                                                size="sm"
-                                                radius="sm"
                                                 type="password"
                                                 placeholder="********"
                                                 {...field}
                                             />
 
-                                            <div>
-                                                <Tooltip content="Generate a random password">
-                                                    <Button
-                                                        isIconOnly
-                                                        radius="sm"
-                                                        size="sm"
-                                                        className="absolute right-2 top-1/2 -translate-y-1/2"
-                                                        startContent={
-                                                            <Icons.key className="h-4 w-4" />
-                                                        }
-                                                        onPress={
-                                                            handleGeneratePassword
-                                                        }
-                                                    />
+                                            <TooltipProvider>
+                                                <Tooltip delayDuration={100}>
+                                                    <TooltipTrigger asChild>
+                                                        <Button
+                                                            type="button"
+                                                            variant="ghost"
+                                                            className="absolute right-1 top-1/2 -translate-y-1/2 rounded-sm"
+                                                            size="icon"
+                                                            onClick={
+                                                                handleGeneratePassword
+                                                            }
+                                                        >
+                                                            <Icons.key className="size-4" />
+                                                        </Button>
+                                                    </TooltipTrigger>
+
+                                                    <TooltipContent>
+                                                        Generate a random
+                                                        password
+                                                    </TooltipContent>
                                                 </Tooltip>
-                                            </div>
+                                            </TooltipProvider>
                                         </div>
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )}
                         />
-                    </CardBody>
+                    </CardContent>
 
                     <CardFooter>
                         <Button
-                            className="font-bold text-black"
-                            color="primary"
-                            fullWidth
-                            radius="sm"
+                            className="w-full font-semibold"
                             type="submit"
-                            isDisabled={isLoading}
-                            isLoading={isLoading}
+                            classNames={{
+                                startContent: "text-background",
+                            }}
+                            isDisabled={isPending}
+                            isLoading={isPending}
                         >
                             Submit
                         </Button>

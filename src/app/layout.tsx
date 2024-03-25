@@ -1,11 +1,11 @@
 import "./globals.css";
-import { siteConfig } from "@/src/config/site";
+import { Toaster } from "@/components/ui/sonner";
+import { siteConfig } from "@/config/site";
 import { Metadata } from "next";
 import { Titillium_Web } from "next/font/google";
-import { Toaster } from "react-hot-toast";
 import ClientProvider from "../components/providers/client";
-import { cn } from "../lib/utils";
-import { RootLayoutProps } from "../types";
+import { cn, getAbsoluteURL } from "../lib/utils";
+import { LayoutProps } from "../types";
 
 const font = Titillium_Web({
     subsets: ["latin"],
@@ -15,21 +15,21 @@ const font = Titillium_Web({
 export const metadata: Metadata = {
     title: {
         default: siteConfig.name,
-        template: `%s | ${siteConfig.name}`,
+        template: "%s | " + siteConfig.name,
     },
     description: siteConfig.description,
     keywords: siteConfig.keywords,
     authors: [
         {
             name: siteConfig.name,
-            url: siteConfig.url,
+            url: getAbsoluteURL(),
         },
     ],
     creator: siteConfig.name,
     openGraph: {
         type: "website",
         locale: "en_US",
-        url: siteConfig.url,
+        url: getAbsoluteURL(),
         title: siteConfig.name,
         description: siteConfig.description,
         siteName: siteConfig.name,
@@ -54,31 +54,26 @@ export const metadata: Metadata = {
         shortcut: "/favicon-16x16.png",
         apple: "/apple-touch-icon.png",
     },
-    manifest: `${siteConfig.url}/site.webmanifest`,
-    metadataBase: new URL(siteConfig.url),
+    manifest: getAbsoluteURL("/site.webmanifest"),
+    metadataBase: new URL(getAbsoluteURL()),
 };
 
-function RootLayout({ children }: RootLayoutProps) {
+function RootLayout({ children }: LayoutProps) {
     return (
-            <html lang="en" suppressHydrationWarning>
-                <head />
-                <ClientProvider
-                    className={cn(
-                        font.className,
-                        "min-h-screen overflow-x-hidden scroll-smooth bg-background text-foreground antialiased"
-                    )}
-                >
+        <html lang="en" suppressHydrationWarning>
+            <head />
+            <body
+                className={cn(
+                    font.className,
+                    "flex min-h-screen flex-col overflow-x-hidden antialiased"
+                )}
+            >
+                <ClientProvider>
                     {children}
-                    <Toaster
-                        toastOptions={{
-                            style: {
-                                background: "#333",
-                                color: "#fff",
-                            },
-                        }}
-                    />
+                    <Toaster />
                 </ClientProvider>
-            </html>
+            </body>
+        </html>
     );
 }
 

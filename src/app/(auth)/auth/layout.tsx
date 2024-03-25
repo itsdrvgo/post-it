@@ -1,5 +1,4 @@
-import Warning from "@/src/components/global/404/warning";
-import { RootLayoutProps } from "@/src/types";
+import { LayoutProps } from "@/types";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -7,16 +6,8 @@ export const metadata: Metadata = {
     description: "Sign in or sign up to continue",
 };
 
-function Layout({ children }: RootLayoutProps) {
-    return (
-        <div className="flex min-h-screen flex-col">
-            <Warning
-                content="PLEASE DO NOT USE REAL PASSWORDS AS CREDENTIALS."
-                className="fixed top-0"
-            />
-            <main>{children}</main>
-        </div>
-    );
+function Layout({ children }: LayoutProps) {
+    return <main className="flex flex-1 flex-col">{children}</main>;
 }
 
 export default Layout;

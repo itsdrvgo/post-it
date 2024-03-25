@@ -1,4 +1,4 @@
-import { createId } from "@paralleldrive/cuid2";
+import { generateId } from "@/lib/utils";
 import { ChangeEvent, ClipboardEvent, DragEvent } from "react";
 import {
     ACCEPTED_IMAGE_TYPES,
@@ -123,13 +123,13 @@ export function useDropzone() {
                 file.size <= MAX_IMAGE_FILE_SIZE
             ) {
                 acceptedFiles.push({
-                    id: createId(),
+                    id: generateId(),
                     file,
                     url: URL.createObjectURL(file),
                 });
             } else {
                 rejectedFiles.push({
-                    id: createId(),
+                    id: generateId(),
                     file,
                     url: URL.createObjectURL(file),
                 });

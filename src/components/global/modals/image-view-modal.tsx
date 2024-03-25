@@ -1,38 +1,25 @@
 "use client";
 
-import { Image, Modal, ModalBody, ModalContent } from "@nextui-org/react";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import NextImage from "next/image";
+import { Dispatch, ReactNode, SetStateAction } from "react";
 
 interface PageProps {
-    onClose: () => void;
     isOpen: boolean;
-    onOpenChange: (open: boolean) => void;
+    setIsOpen: Dispatch<SetStateAction<boolean>>;
     image: string;
+    trigger: ReactNode;
 }
 
-function ImageViewModal({ onClose, isOpen, onOpenChange, image }: PageProps) {
+function ImageViewModal({ isOpen, setIsOpen, trigger, image }: PageProps) {
     return (
-        <Modal
-            isOpen={isOpen}
-            onClose={onClose}
-            onOpenChange={onOpenChange}
-            placement="center"
-            hideCloseButton
-            classNames={{
-                body: "p-0",
-                base: "w-auto",
-            }}
-            backdrop="blur"
-        >
-            <ModalContent>
-                {() => (
-                    <>
-                        <ModalBody>
-                            <Image radius="none" src={image} alt="Image" />
-                        </ModalBody>
-                    </>
-                )}
-            </ModalContent>
-        </Modal>
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+            {trigger}
+
+            <DialogContent className="w-full max-w-full border-none !bg-transparent p-0 !pr-0 sm:max-w-full md:w-auto">
+                <NextImage src={image} alt="Image" width={1000} height={1000} />
+            </DialogContent>
+        </Dialog>
     );
 }
 

@@ -1,49 +1,54 @@
 "use client";
 
-import { DEFAULT_IMAGE_URL } from "@/src/config/const";
-import { Post } from "@/src/lib/drizzle/schema";
-import { trpc } from "@/src/lib/trpc/client";
+import { DEFAULT_IMAGE_URL } from "@/config/const";
+import { Post } from "@/lib/drizzle/schema";
+import { trpc } from "@/lib/trpc/client";
 import {
     cn,
     convertMstoTimeElapsed,
     extractYTVideoId,
+    generateId,
+    generatePostURL,
+    getAccessToken,
     handleClientError,
     isYouTubeVideo,
-} from "@/src/lib/utils";
-import { DefaultProps } from "@/src/types";
-import {
-    Avatar,
-    Button,
-    Dropdown,
-    DropdownItem,
-    DropdownMenu,
-    DropdownSection,
-    DropdownTrigger,
-    Image,
-    Link,
-    Modal,
-    ModalBody,
-    ModalContent,
-    ModalFooter,
-    ModalHeader,
-    useDisclosure,
-} from "@nextui-org/react";
-import { createId } from "@paralleldrive/cuid2";
+    wait,
+} from "@/lib/utils";
+import { UserClientData } from "@/lib/validation/user";
+import { GenericProps } from "@/types";
 import NextImage from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
-import toast from "react-hot-toast";
 import LiteYouTubeEmbed from "react-lite-youtube-embed";
 import "react-lite-youtube-embed/dist/LiteYouTubeEmbed.css";
+import { toast } from "sonner";
 import ImageViewModal from "../global/modals/image-view-modal";
 import { Icons } from "../icons/icons";
-import { SafeUser } from "../providers/user";
+import { setToken } from "../providers/client";
+import {
+    AlertDialog,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "../ui/alert-dialog";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { Button } from "../ui/button";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
+import { Link } from "../ui/link";
 
-interface PageProps extends DefaultProps {
+interface PageProps extends GenericProps {
     post: Post & {
-        author: SafeUser;
+        author: UserClientData;
     };
-    user: SafeUser;
+    user: UserClientData;
 }
 
 function PostCard({ post, user, className, ...props }: PageProps) {
@@ -51,48 +56,56 @@ function PostCard({ post, user, className, ...props }: PageProps) {
     const pathname = usePathname();
 
     const [image, setImage] = useState<string | null>(null);
+    const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [isImageViewModalOpen, setImageViewModalOpen] = useState(false);
 
-    const {
-        isOpen: isDeleteModalOpen,
-        onClose: onDeleteModalClose,
-        onOpen: onDeleteModalOpen,
-        onOpenChange: onDeleteModalOpenChange,
-    } = useDisclosure();
-
-    const {
-        isOpen: isImageViewModalOpen,
-        onClose: onImageViewModalClose,
-        onOpen: onImageViewModalOpen,
-        onOpenChange: onImageViewModalOpenChange,
-    } = useDisclosure();
-
-    const { mutate: deletePost, isLoading: isDeleting } =
+    const { mutate: deletePost, isPending: isDeleting } =
         trpc.posts.deletePost.useMutation({
             onMutate: () => {
                 const toastId = toast.loading("Deleting post...");
                 return { toastId };
             },
             onSuccess: (_, __, ctx) => {
-                onDeleteModalClose();
                 toast.success("Post deleted!", {
-                    id: ctx?.toastId,
+                    id: ctx.toastId,
                 });
-                router.refresh();
+
+                setDeleteModalOpen(false);
+                router.push("/");
             },
             onError: (err, _, ctx) => {
                 handleClientError(err, ctx?.toastId);
             },
         });
 
+    const handleDeletePost = async () => {
+        const accessToken = await getAccessToken();
+        setToken(accessToken);
+
+        deletePost({
+            id: post.id,
+        });
+    };
+
     return (
         <>
-            <div className={cn("flex gap-3 md:gap-4", className)} {...props}>
+            <div
+                className={cn(
+                    "flex w-full justify-between gap-3 md:gap-4",
+                    className
+                )}
+                {...props}
+            >
                 <div>
-                    <Avatar
-                        src={DEFAULT_IMAGE_URL}
-                        alt={post.author.username}
-                        showFallback
-                    />
+                    <Avatar>
+                        <AvatarImage
+                            src={DEFAULT_IMAGE_URL}
+                            alt={post.author.username}
+                        />
+                        <AvatarFallback>
+                            {post.author.username[0].toUpperCase()}
+                        </AvatarFallback>
+                    </Avatar>
                 </div>
 
                 <div className="flex w-full flex-col gap-2">
@@ -101,7 +114,7 @@ function PostCard({ post, user, className, ...props }: PageProps) {
                             <p className="font-semibold">
                                 {post.author.username}
                             </p>
-                            <p className="space-x-1 text-sm text-white/60">
+                            <p className="space-x-1 text-sm text-muted-foreground">
                                 <span>@postit</span>
                                 <span>•</span>
                                 <span>
@@ -112,61 +125,87 @@ function PostCard({ post, user, className, ...props }: PageProps) {
                             </p>
                         </div>
 
-                        <Dropdown>
-                            <DropdownTrigger>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
                                 <Button
-                                    isIconOnly
-                                    radius="full"
-                                    size="sm"
-                                    variant="light"
-                                    startContent={
-                                        <Icons.moreVert className="h-4 w-4" />
-                                    }
-                                />
-                            </DropdownTrigger>
-
-                            <DropdownMenu>
-                                <DropdownSection
-                                    aria-label="Public actions"
-                                    showDivider={
-                                        !!user && user.id === post.author.id
-                                    }
+                                    size="icon"
+                                    variant="ghost"
+                                    className="rounded-full"
                                 >
-                                    <DropdownItem
-                                        key="copy_link"
-                                        onPress={() => {
-                                            navigator.clipboard.writeText(
-                                                window.location.href +
-                                                    "posts?p=" +
-                                                    post.id
-                                            );
-                                            toast.success(
-                                                "Copied link to clipboard"
-                                            );
-                                        }}
-                                    >
-                                        Copy Link
-                                    </DropdownItem>
-                                </DropdownSection>
+                                    <Icons.moreVert className="size-4" />
+                                </Button>
+                            </DropdownMenuTrigger>
 
-                                <DropdownSection
-                                    aria-label="Private actions"
-                                    className={cn(
-                                        !!user && user.id === post.author.id
-                                            ? "block"
-                                            : "hidden"
-                                    )}
+                            <DropdownMenuContent className="z-50">
+                                <DropdownMenuItem
+                                    onSelect={() => {
+                                        navigator.clipboard.writeText(
+                                            generatePostURL(post.id)
+                                        );
+                                        toast.success(
+                                            "Copied link to clipboard"
+                                        );
+                                    }}
                                 >
-                                    <DropdownItem
-                                        key="delete"
-                                        color="danger"
-                                        onPress={onDeleteModalOpen}
+                                    Copy Link
+                                </DropdownMenuItem>
+
+                                {user.id === post.author.id && (
+                                    <>
+                                        <DropdownMenuSeparator />
+
+                                        <DropdownMenuItem
+                                            onSelect={() =>
+                                                setDeleteModalOpen(true)
+                                            }
+                                        >
+                                            Delete
+                                        </DropdownMenuItem>
+                                    </>
+                                )}
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+
+                        <AlertDialog
+                            open={isDeleteModalOpen}
+                            onOpenChange={setDeleteModalOpen}
+                        >
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle>
+                                        Delete Post
+                                    </AlertDialogTitle>
+
+                                    <AlertDialogDescription>
+                                        Are you sure you want to delete this
+                                        post? This action is irreversible.
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+
+                                <AlertDialogFooter>
+                                    <Button
+                                        size="sm"
+                                        variant="outline"
+                                        isDisabled={isDeleting}
+                                        onClick={() =>
+                                            setDeleteModalOpen(false)
+                                        }
                                     >
-                                        Delete
-                                    </DropdownItem>
-                                </DropdownSection>
-                            </DropdownMenu>
-                        </Dropdown>
+                                        Cancel
+                                    </Button>
+
+                                    <Button
+                                        size="sm"
+                                        variant="destructive"
+                                        isDisabled={isDeleting}
+                                        isLoading={isDeleting}
+                                        onClick={handleDeletePost}
+                                    >
+                                        Delete Post
+                                    </Button>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
                     </div>
 
                     <p className="text-sm md:text-base">
@@ -181,47 +220,20 @@ function PostCard({ post, user, className, ...props }: PageProps) {
                     {post.metadata &&
                         Object.keys(post.metadata).length > 0 &&
                         post.metadata.isVisible && (
-                            <div
+                            <Link
+                                type="link"
+                                isExternal
+                                href={post.metadata.url}
                                 className={cn(
-                                    "flex h-min gap-2 rounded-xl bg-default-100 p-2",
+                                    "relative flex gap-2 overflow-hidden rounded-lg border bg-card",
                                     isYouTubeVideo(post.metadata.url)
-                                        ? "flex-col"
-                                        : "flex-row-reverse"
+                                        ? "flex-col-reverse"
+                                        : "flex-row"
                                 )}
                             >
-                                {isYouTubeVideo(post.metadata.url) ? (
-                                    <div className="overflow-hidden rounded-lg">
-                                        <LiteYouTubeEmbed
-                                            id={
-                                                extractYTVideoId(
-                                                    post.metadata.url
-                                                ) ?? ""
-                                            }
-                                            title={
-                                                post.metadata.title ??
-                                                "video_" + createId()
-                                            }
-                                        />
-                                    </div>
-                                ) : (
-                                    post.metadata.image && (
-                                        <div className="basis-1/5">
-                                            <Image
-                                                radius="sm"
-                                                src={post.metadata.image}
-                                                alt={
-                                                    post.metadata.title ??
-                                                    "image_" + createId()
-                                                }
-                                                className="aspect-square object-cover"
-                                            />
-                                        </div>
-                                    )
-                                )}
-
                                 <div
                                     className={cn(
-                                        "basis-4/5 px-1",
+                                        "basis-4/5 p-4 md:basis-3/5",
                                         post.metadata.title &&
                                             post.metadata.description &&
                                             "space-y-1"
@@ -233,12 +245,50 @@ function PostCard({ post, user, className, ...props }: PageProps) {
                                         </p>
                                     )}
                                     {post.metadata.description && (
-                                        <p className="text-sm opacity-60">
-                                            {post.metadata.description}
+                                        <p className="text-sm text-foreground/60">
+                                            {post.metadata.description.length >
+                                            120
+                                                ? post.metadata.description.slice(
+                                                      0,
+                                                      120
+                                                  ) + "..."
+                                                : post.metadata.description}
                                         </p>
                                     )}
                                 </div>
-                            </div>
+
+                                {isYouTubeVideo(post.metadata.url) ? (
+                                    <LiteYouTubeEmbed
+                                        id={
+                                            extractYTVideoId(
+                                                post.metadata.url
+                                            ) ?? ""
+                                        }
+                                        title={
+                                            post.metadata.title ??
+                                            "video_" + generateId()
+                                        }
+                                    />
+                                ) : (
+                                    post.metadata.image && (
+                                        <div className="flex aspect-square basis-1/5 md:aspect-auto md:basis-2/5">
+                                            <div className="md:basis-1/2"></div>
+                                            <div className="aspect-square basis-1/2">
+                                                <NextImage
+                                                    src={post.metadata.image}
+                                                    alt={
+                                                        post.metadata.title ??
+                                                        "image_" + generateId()
+                                                    }
+                                                    className="size-full object-cover"
+                                                    width={500}
+                                                    height={500}
+                                                />
+                                            </div>
+                                        </div>
+                                    )
+                                )}
+                            </Link>
                         )}
 
                     {post.attachments && post.attachments.length > 0 && (
@@ -253,21 +303,34 @@ function PostCard({ post, user, className, ...props }: PageProps) {
                             {post.attachments.map((attachment) => (
                                 <div
                                     key={attachment?.id}
-                                    className="overflow-hidden"
+                                    className="group relative aspect-video overflow-hidden rounded-lg"
                                 >
-                                    <Image
-                                        as={NextImage}
-                                        src={attachment?.url}
-                                        alt={attachment?.name}
-                                        radius="sm"
-                                        className="aspect-video cursor-pointer object-cover"
-                                        width={700}
-                                        height={700}
-                                        onClick={() => {
-                                            if (pathname === "/") return;
-                                            setImage(attachment?.url ?? "");
-                                            onImageViewModalOpen();
-                                        }}
+                                    <ImageViewModal
+                                        image={image ?? ""}
+                                        isOpen={isImageViewModalOpen}
+                                        setIsOpen={setImageViewModalOpen}
+                                        trigger={
+                                            <NextImage
+                                                src={attachment?.url!}
+                                                alt={
+                                                    attachment?.name ??
+                                                    "image_" + generateId()
+                                                }
+                                                className="size-full object-cover"
+                                                width={700}
+                                                height={700}
+                                                onClick={async () => {
+                                                    if (pathname === "/")
+                                                        return;
+                                                    setImage(
+                                                        attachment?.url ?? ""
+                                                    );
+
+                                                    await wait(100);
+                                                    setImageViewModalOpen(true);
+                                                }}
+                                            />
+                                        }
                                     />
                                 </div>
                             ))}
@@ -275,58 +338,6 @@ function PostCard({ post, user, className, ...props }: PageProps) {
                     )}
                 </div>
             </div>
-
-            <ImageViewModal
-                image={image ?? ""}
-                isOpen={isImageViewModalOpen}
-                onClose={onImageViewModalClose}
-                onOpenChange={onImageViewModalOpenChange}
-            />
-
-            <Modal
-                isOpen={isDeleteModalOpen}
-                onOpenChange={onDeleteModalOpenChange}
-                onClose={onDeleteModalClose}
-            >
-                <ModalContent>
-                    {(close) => (
-                        <>
-                            <ModalHeader>Delete Post</ModalHeader>
-
-                            <ModalBody>
-                                Are you sure you want to delete this post? This
-                                action is irreversible.
-                            </ModalBody>
-
-                            <ModalFooter>
-                                <Button
-                                    radius="sm"
-                                    variant="light"
-                                    isDisabled={isDeleting}
-                                    onPress={close}
-                                >
-                                    Cancel
-                                </Button>
-
-                                <Button
-                                    color="primary"
-                                    variant="faded"
-                                    radius="sm"
-                                    isLoading={isDeleting}
-                                    isDisabled={isDeleting}
-                                    onPress={() =>
-                                        deletePost({
-                                            id: post.id,
-                                        })
-                                    }
-                                >
-                                    Delete
-                                </Button>
-                            </ModalFooter>
-                        </>
-                    )}
-                </ModalContent>
-            </Modal>
         </>
     );
 }
@@ -337,16 +348,23 @@ export function sanitizeContent(content: string) {
     return content.split(/(https?:\/\/[^\s]+)/g).map((part) => {
         if (part.match(/(https?:\/\/[^\s]+)/g)) {
             return (
-                <Link key={createId()} href={part} underline="hover" isExternal>
+                <Link
+                    type="link"
+                    className="text-primary underline"
+                    key={generateId()}
+                    href={part}
+                    isExternal
+                >
                     {part}
                 </Link>
             );
         } else if (part.match(/(@[^\s]+)/g)) {
             return (
                 <Link
-                    key={createId()}
+                    type="link"
+                    className="text-primary"
+                    key={generateId()}
                     href={`/u/${part.slice(1)}`}
-                    underline="hover"
                 >
                     {part}
                 </Link>
@@ -354,9 +372,10 @@ export function sanitizeContent(content: string) {
         } else if (part.match(/(#[^\s]+)/g)) {
             return (
                 <Link
-                    key={createId()}
+                    type="link"
+                    className="text-primary"
+                    key={generateId()}
                     href={`/t/${part.slice(1)}`}
-                    underline="hover"
                 >
                     {part}
                 </Link>

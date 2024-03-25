@@ -1,6 +1,6 @@
+import { GoBackButton } from "@/components/global/buttons/go-back-button";
+import { EmptyPlaceholder } from "@/components/ui/empty-placeholder";
 import { Metadata } from "next";
-import GoBackButton from "../components/global/buttons/go-back-button";
-import { EmptyPlaceholder } from "../components/ui/empty-placeholder";
 
 export const metadata: Metadata = {
     title: "Page not found",
@@ -9,13 +9,14 @@ export const metadata: Metadata = {
 
 function Page() {
     return (
-        <section className="flex h-screen w-full items-center justify-center p-5">
+        <section
+            className="flex h-full min-h-screen items-center justify-center bg-background"
+        >
             <EmptyPlaceholder
-                className="max-w-md"
                 title="Page not found"
                 description="The page you are looking for does not exist. Please check the URL or go back to the previous page."
                 icon="construction"
-                endContent={<GoBackButton color="danger" />}
+                endContent={<GoBackButton className="text-white" />}
             />
         </section>
     );

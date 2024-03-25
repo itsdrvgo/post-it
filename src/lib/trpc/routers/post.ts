@@ -1,4 +1,4 @@
-import { utapi } from "@/src/app/api/uploadthing/core";
+import { utapi } from "@/app/api/uploadthing/core";
 import { TRPCError } from "@trpc/server";
 import { eq, inArray } from "drizzle-orm";
 import { withCursorPagination } from "drizzle-pagination";
@@ -8,13 +8,11 @@ import {
     postAttachmentSchema,
     postMetadataSchema,
 } from "../../validation/post";
-import { createTRPCRouter, publicProcedure } from "../trpc";
-
-const postCreateSchema = insertPostSchema.omit({
-    id: true,
-    createdAt: true,
-    updatedAt: true,
-});
+import {
+    createTRPCRouter,
+    protectedProcedure,
+    protectedProcedureWithAccessToken,
+} from "../trpc";
 
 const postUpdateSchema = selectPostSchema.omit({
     createdAt: true,
@@ -23,7 +21,7 @@ const postUpdateSchema = selectPostSchema.omit({
 });
 
 export const postRouter = createTRPCRouter({
-    getPost: publicProcedure
+    getPost: protectedProcedure
         .input(z.object({ id: z.string() }))
         .use(async ({ input, ctx, next }) => {
             const { id } = input;
@@ -50,7 +48,7 @@ export const postRouter = createTRPCRouter({
             const { post } = ctx;
             return post;
         }),
-    getInfinitePosts: publicProcedure
+    getInfinitePosts: protectedProcedure
         .input(
             z.object({
                 userId: z.string().optional(),
@@ -82,6 +80,7 @@ export const postRouter = createTRPCRouter({
                 .select({
                     id: users.id,
                     username: users.username,
+                    isFirstTime: users.isFirstTime,
                     createdAt: users.createdAt,
                 })
                 .from(users)
@@ -106,42 +105,19 @@ export const postRouter = createTRPCRouter({
                     : null,
             };
         }),
-    createPost: publicProcedure
+    createPost: protectedProcedureWithAccessToken
         .input(
             z.object({
-                ...postCreateSchema.shape,
+                ...insertPostSchema.shape,
                 attachments: z.array(postAttachmentSchema),
                 metadata: postMetadataSchema,
             })
         )
-        .use(async ({ input, ctx, next }) => {
-            const { authorId } = input;
-            const { db, users } = ctx;
-
-            const user = await db.query.users.findFirst({
-                where: eq(users.id, authorId),
-            });
-
-            if (!user)
-                throw new TRPCError({
-                    code: "NOT_FOUND",
-                    message: "User not found",
-                });
-
-            return next({
-                ctx,
-            });
-        })
         .mutation(async ({ input, ctx }) => {
             const { db, posts } = ctx;
-
             await db.insert(posts).values(input);
-
-            return {
-                success: true,
-            };
         }),
-    deletePost: publicProcedure
+    deletePost: protectedProcedureWithAccessToken
         .input(z.object({ id: z.string() }))
         .use(async ({ input, ctx, next }) => {
             const { id } = input;
@@ -177,12 +153,8 @@ export const postRouter = createTRPCRouter({
             }
 
             await db.delete(posts).where(eq(posts.id, id));
-
-            return {
-                success: true,
-            };
         }),
-    updatePost: publicProcedure
+    updatePost: protectedProcedureWithAccessToken
         .input(
             z.object({
                 ...postUpdateSchema.shape,
@@ -213,9 +185,5 @@ export const postRouter = createTRPCRouter({
             const { db, posts } = ctx;
 
             await db.update(posts).set(rest).where(eq(posts.id, id));
-
-            return {
-                success: true,
-            };
         }),
 });

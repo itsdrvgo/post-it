@@ -32,6 +32,8 @@ import {
     Copy,
     CreditCard,
     DollarSign,
+    Dot,
+    ExternalLink,
     Eye,
     EyeOff,
     Facebook,
@@ -131,6 +133,9 @@ import {
 export type Icon = LucideIcon;
 
 export const Icons = {
+    dot: Dot,
+    cross: X,
+    externalLink: ExternalLink,
     key: Key,
     zoom: ZoomIn,
     fullscreen: Fullscreen,

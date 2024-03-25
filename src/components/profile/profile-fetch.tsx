@@ -1,20 +1,30 @@
-"use client";
-
-import { DefaultProps } from "@/src/types";
-import { useRouter } from "next/navigation";
-import { useUser } from "../providers/user";
-import Loader from "../ui/loader";
+import { PAGES, TOKENS } from "@/config/const";
+import { db } from "@/lib/drizzle";
+import { users } from "@/lib/drizzle/schema";
+import { decodeAuthToken } from "@/lib/jwt";
+import { userClientSchema } from "@/lib/validation/user";
+import { GenericProps } from "@/types";
+import { eq } from "drizzle-orm";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import ProfilePage from "./profile-page";
 
-function ProfileFetch(props: DefaultProps) {
-    const router = useRouter();
+async function ProfileFetch(props: GenericProps) {
+    const cookieStore = cookies();
+    const authToken = cookieStore.get(TOKENS.AUTH_COOKIE_NAME)?.value;
+    if (!authToken) redirect(PAGES.AUTH_PAGE);
 
-    const { isLoaded, isSignedIn, user, setUser } = useUser();
+    const { sub: userId } = decodeAuthToken(authToken);
+    if (!userId) redirect(PAGES.AUTH_PAGE);
 
-    if (!isLoaded) return <Loader />;
-    if (!isSignedIn) router.push("/auth");
+    const user = await db.query.users.findFirst({
+        where: eq(users.id, userId),
+    });
+    if (!user) redirect(PAGES.AUTH_PAGE);
 
-    return <ProfilePage user={user!} setUser={setUser} {...props} />;
+    const parsedUser = userClientSchema.parse(user);
+
+    return <ProfilePage user={parsedUser} {...props} />;
 }
 
 export default ProfileFetch;

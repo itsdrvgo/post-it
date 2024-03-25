@@ -1,67 +1,70 @@
 "use client";
 
-import { cn } from "@/src/lib/utils";
-import {
-    Card,
-    CardBody,
-    CardFooter,
-    CardHeader,
-    CardProps,
-} from "@nextui-org/react";
-import { ReactNode } from "react";
+import { cn } from "@/lib/utils";
+import { GenericProps } from "@/types";
+import { forwardRef, ReactNode } from "react";
 import { Icons } from "../icons/icons";
 
-export interface EmptyPlaceholderProps extends CardProps {
+interface EmptyPlaceholderProps extends GenericProps {
     title: string;
     description: string;
     icon?: keyof typeof Icons;
     endContent?: ReactNode;
     isBackgroundVisible?: boolean;
+    fullWidth?: boolean;
 }
 
-export function EmptyPlaceholder({
-    title,
-    description,
-    icon,
-    className,
-    endContent,
-    isBackgroundVisible = true,
-    ...props
-}: EmptyPlaceholderProps) {
-    const Icon = icon ? Icons[icon] : undefined;
+const EmptyPlaceholder = forwardRef<HTMLDivElement, EmptyPlaceholderProps>(
+    (
+        {
+            className,
+            title,
+            description,
+            icon,
+            endContent,
+            isBackgroundVisible = true,
+            fullWidth,
+            ...props
+        },
+        ref
+    ) => {
+        const Icon = icon ? Icons[icon] : undefined;
 
-    return (
-        <Card
-            className={cn("gap-3 py-10", className)}
-            fullWidth
-            classNames={{
-                base: isBackgroundVisible
-                    ? "bg-default-50 shadow-md"
-                    : "bg-transparent shadow-none",
-            }}
-            {...props}
-        >
-            {Icon && (
-                <CardHeader className="items-center justify-center">
-                    <div className="rounded-full bg-secondary p-5">
-                        <div>
+        return (
+            <div
+                ref={ref}
+                className={cn(
+                    "space-y-5 rounded-xl border bg-background p-10 text-foreground shadow",
+                    !isBackgroundVisible && "bg-transparent shadow-none",
+                    fullWidth && "w-full",
+                    className
+                )}
+                {...props}
+            >
+                {Icon && (
+                    <div className="flex items-center justify-center">
+                        <div className="rounded-full bg-primary p-5 text-white">
                             <Icon />
                         </div>
                     </div>
-                </CardHeader>
-            )}
-            <CardBody className="flex flex-col items-center gap-4 text-center">
-                <p className="text-2xl font-bold">{title}</p>
-                <p className="max-w-xs text-balance text-sm text-gray-400">
-                    {description}
-                </p>
-            </CardBody>
+                )}
 
-            {endContent && (
-                <CardFooter className="flex items-center justify-center">
-                    {endContent}
-                </CardFooter>
-            )}
-        </Card>
-    );
-}
+                <div className="space-y-3 text-center">
+                    <h3 className="text-2xl font-bold">{title}</h3>
+                    <p className="max-w-xs text-sm text-muted-foreground">
+                        {description}
+                    </p>
+                </div>
+
+                {endContent && (
+                    <div className="flex items-center justify-center">
+                        {endContent}
+                    </div>
+                )}
+            </div>
+        );
+    }
+);
+EmptyPlaceholder.displayName = "EmptyPlaceholder";
+
+export { EmptyPlaceholder, type EmptyPlaceholderProps };

@@ -1,6 +1,6 @@
-import Footer from "@/src/components/global/footer/footer";
-import Nav from "@/src/components/global/navbar/navbar";
-import { RootLayoutProps } from "@/src/types";
+import Footer from "@/components/global/footer/footer";
+import Navbar from "@/components/global/navbar/navbar";
+import { LayoutProps } from "@/types";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -8,10 +8,10 @@ export const metadata: Metadata = {
     description: "Create a new post",
 };
 
-function Layout({ children }: RootLayoutProps) {
+function Layout({ children }: LayoutProps) {
     return (
         <div className="flex min-h-screen flex-col">
-            <Nav />
+            <Navbar />
             <main className="flex-1">{children}</main>
             <Footer />
         </div>

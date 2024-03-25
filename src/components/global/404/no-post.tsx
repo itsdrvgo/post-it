@@ -1,6 +1,4 @@
-"use client";
-
-import { EmptyPlaceholder } from "../../ui/empty-placeholder";
+import { EmptyPlaceholder } from "@/components/ui/empty-placeholder";
 
 function NoPostPage() {
     return (

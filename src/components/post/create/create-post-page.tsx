@@ -1,29 +1,35 @@
 "use client";
 
-import { DEFAULT_IMAGE_URL } from "@/src/config/const";
-import { UploadEvent, useDropzone } from "@/src/hooks/useDropzone";
-import { trpc } from "@/src/lib/trpc/client";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import Loader from "@/components/ui/loader";
+import { Textarea } from "@/components/ui/textarea";
+import { DEFAULT_IMAGE_URL } from "@/config/const";
+import { UploadEvent, useDropzone } from "@/hooks/useDropzone";
+import { trpc } from "@/lib/trpc/client";
 import {
     cFetch,
     cn,
     extractYTVideoId,
+    generateId,
+    getAccessToken,
     handleClientError,
     isYouTubeVideo,
-} from "@/src/lib/utils";
-import { ResponseData } from "@/src/lib/validation/response";
-import { DefaultProps } from "@/src/types";
-import { Avatar, Button, Image, Spinner, Textarea } from "@nextui-org/react";
-import { createId } from "@paralleldrive/cuid2";
+} from "@/lib/utils";
+import { ResponseData } from "@/lib/validation/response";
+import { UserClientData } from "@/lib/validation/user";
+import { GenericProps } from "@/types";
+import NextImage from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import toast from "react-hot-toast";
 import LiteYouTubeEmbed from "react-lite-youtube-embed";
 import "react-lite-youtube-embed/dist/LiteYouTubeEmbed.css";
+import { setToken } from "@/components/providers/client";
+import { toast } from "sonner";
 import { Icons } from "../../icons/icons";
-import { SafeUser } from "../../providers/user";
 
-interface PageProps extends DefaultProps {
-    user: SafeUser;
+interface PageProps extends GenericProps {
+    user: UserClientData;
 }
 
 function CreatePostPage({ user, className, ...props }: PageProps) {
@@ -33,7 +39,7 @@ function CreatePostPage({ user, className, ...props }: PageProps) {
     const [isDragging, setIsDragging] = useState(false);
 
     const [isLoading, setIsLoading] = useState(false);
-    const [toastId, setToastId] = useState<string | undefined>(undefined);
+    const [toastId, setToastId] = useState<string | number>();
 
     const [content, setContent] = useState("");
     const [images, setImages] = useState<ExtendedFile[]>([]);
@@ -58,7 +64,7 @@ function CreatePostPage({ user, className, ...props }: PageProps) {
         }
     }, [content]);
 
-    const { data: linkPreview, isLoading: isLinkLoading } =
+    const { data: linkPreview, isPending: isLinkLoading } =
         trpc.links.getMetadata.useQuery({
             link,
         });
@@ -130,51 +136,63 @@ function CreatePostPage({ user, className, ...props }: PageProps) {
     });
 
     const handleCreatePost = async () => {
-        setIsLoading(true);
-        setToastId(toast.loading("Creating post..."));
+        try {
+            setIsLoading(true);
+            const tId = toast.loading("Creating post...");
+            setToastId(tId);
 
-        const formData = new FormData();
+            const accessToken = await getAccessToken();
+            setToken(accessToken);
 
-        const uploadedImages: UploadFileResponse[] = [];
+            const formData = new FormData();
 
-        if (images.length) {
-            await Promise.all(
-                images.map((image) => {
-                    formData.append("image", image.file);
-                })
-            );
+            const uploadedImages: UploadFileResponse[] = [];
 
-            const res = await cFetch<ResponseData<UploadFileResponse[]>>(
-                "/api/uploads",
-                {
-                    method: "POST",
-                    body: formData,
-                }
-            );
+            if (images.length) {
+                await Promise.all(
+                    images.map((image) => {
+                        formData.append("image", image.file);
+                    })
+                );
 
-            if (res.message !== "OK") return toast.error(res.longMessage!);
-            if (!res.data) return toast.error("No data returned");
+                const res = await cFetch<ResponseData<UploadFileResponse[]>>(
+                    "/api/uploads",
+                    {
+                        method: "POST",
+                        body: formData,
+                        headers: {
+                            Authorization: `Bearer ${accessToken}`,
+                        },
+                    }
+                );
 
-            uploadedImages.push(...res.data);
+                if (res.message !== "OK") throw new Error(res.longMessage!);
+                if (!res.data) throw new Error("No image data returned");
+
+                uploadedImages.push(...res.data);
+            }
+
+            createPost({
+                content: content.trim(),
+                authorId: user.id,
+                metadata: {
+                    ...linkPreview,
+                    url: link,
+                    isVisible: isPreviewVisible,
+                },
+                attachments: uploadedImages.map((image) => {
+                    return {
+                        type: "image",
+                        url: image.data?.url!,
+                        id: image.data?.key!,
+                        name: image.data?.name!,
+                    };
+                }),
+            });
+        } catch (err) {
+            setIsLoading(false);
+            handleClientError(err, toastId);
         }
-
-        createPost({
-            content,
-            authorId: user.id,
-            metadata: {
-                ...linkPreview,
-                url: link,
-                isVisible: isPreviewVisible,
-            },
-            attachments: uploadedImages.map((image) => {
-                return {
-                    type: "image",
-                    url: image.data?.url!,
-                    id: image.data?.key!,
-                    name: image.data?.name!,
-                };
-            }),
-        });
     };
 
     return (
@@ -197,14 +215,15 @@ function CreatePostPage({ user, className, ...props }: PageProps) {
             {...props}
         >
             <div>
-                <Avatar
-                    src={DEFAULT_IMAGE_URL}
-                    alt={user!.username}
-                    showFallback
-                />
+                <Avatar>
+                    <AvatarImage src={DEFAULT_IMAGE_URL} alt={user.username} />
+                    <AvatarFallback>
+                        {user.username[0].toUpperCase()}
+                    </AvatarFallback>
+                </Avatar>
             </div>
 
-            <div className="flex w-full flex-col gap-2">
+            <div className="flex w-full flex-col gap-5">
                 <div className="flex items-center justify-between gap-2">
                     <div>
                         <p className="font-semibold">{user.username}</p>
@@ -212,16 +231,14 @@ function CreatePostPage({ user, className, ...props }: PageProps) {
                     </div>
 
                     <Button
-                        isIconOnly
-                        size="sm"
-                        variant="light"
-                        radius="full"
+                        size="icon"
+                        variant="ghost"
+                        className="rounded-full"
                         isDisabled={isLoading}
-                        startContent={
-                            <Icons.media className="h-5 w-5 text-primary" />
-                        }
-                        onPress={() => fileInputRef.current?.click()}
-                    />
+                        onClick={() => fileInputRef.current?.click()}
+                    >
+                        <Icons.media className="size-5 text-primary" />
+                    </Button>
                 </div>
 
                 <input
@@ -235,66 +252,34 @@ function CreatePostPage({ user, className, ...props }: PageProps) {
 
                 <div className="z-10 space-y-4 bg-background">
                     <Textarea
-                        variant="underlined"
                         placeholder={
                             "What are you thinking, @" + user.username + "?"
                         }
-                        fullWidth
                         ref={textareaRef}
                         isDisabled={isLoading}
+                        minRows={4}
+                        className="resize-none rounded-none border-b bg-transparent p-0 hover:bg-transparent focus:border-b-white focus:bg-transparent"
                         value={content}
                         onValueChange={setContent}
                     />
 
                     {isLinkLoading ? (
-                        <div className="flex justify-center py-2">
-                            <Spinner size="sm" />
-                        </div>
+                        <Loader />
                     ) : (
                         linkPreview &&
                         Object.keys(linkPreview).length > 0 &&
                         (isPreviewVisible ? (
                             <div
                                 className={cn(
-                                    "relative flex h-min gap-2 rounded-xl bg-default-100 p-2",
+                                    "relative flex gap-2 overflow-hidden rounded-lg border bg-card",
                                     isYouTubeVideo(linkPreview.url)
-                                        ? "flex-col"
-                                        : "flex-row-reverse"
+                                        ? "flex-col-reverse"
+                                        : "flex-row"
                                 )}
                             >
-                                {isYouTubeVideo(linkPreview.url) ? (
-                                    <div className="overflow-hidden rounded-lg">
-                                        <LiteYouTubeEmbed
-                                            id={
-                                                extractYTVideoId(
-                                                    linkPreview.url
-                                                ) ?? ""
-                                            }
-                                            title={
-                                                linkPreview.title ??
-                                                "video_" + createId()
-                                            }
-                                        />
-                                    </div>
-                                ) : (
-                                    linkPreview.image && (
-                                        <div className="basis-1/5">
-                                            <Image
-                                                radius="sm"
-                                                src={linkPreview.image}
-                                                alt={
-                                                    linkPreview.title ??
-                                                    "image_" + createId()
-                                                }
-                                                className="aspect-square object-cover"
-                                            />
-                                        </div>
-                                    )
-                                )}
-
                                 <div
                                     className={cn(
-                                        "basis-4/5 px-1",
+                                        "basis-4/5 p-4 md:basis-3/5",
                                         linkPreview.title &&
                                             linkPreview.description &&
                                             "space-y-1"
@@ -306,40 +291,73 @@ function CreatePostPage({ user, className, ...props }: PageProps) {
                                         </p>
                                     )}
                                     {linkPreview.description && (
-                                        <p className="text-sm opacity-60">
-                                            {linkPreview.description}
+                                        <p className="text-sm text-foreground/60">
+                                            {linkPreview.description.length >
+                                            120
+                                                ? linkPreview.description.slice(
+                                                      0,
+                                                      120
+                                                  ) + "..."
+                                                : linkPreview.description}
                                         </p>
                                     )}
                                 </div>
 
-                                <div className="absolute right-2 top-0 z-10">
-                                    <Button
-                                        isIconOnly
-                                        radius="full"
-                                        size="sm"
-                                        variant="shadow"
-                                        className="h-6 w-6 min-w-0"
-                                        isDisabled={isLoading}
-                                        startContent={
-                                            <Icons.close className="h-[14px] w-[14px]" />
+                                {isYouTubeVideo(linkPreview.url) ? (
+                                    <LiteYouTubeEmbed
+                                        id={
+                                            extractYTVideoId(linkPreview.url) ??
+                                            ""
                                         }
-                                        onPress={() =>
-                                            setIsPreviewVisible(false)
+                                        title={
+                                            linkPreview.title ??
+                                            "video_" + generateId()
                                         }
                                     />
+                                ) : (
+                                    linkPreview.image && (
+                                        <div className="flex aspect-square basis-1/5 md:aspect-auto md:basis-2/5">
+                                            <div className="md:basis-1/2"></div>
+                                            <div className="aspect-square basis-1/2">
+                                                <NextImage
+                                                    src={linkPreview.image}
+                                                    alt={
+                                                        linkPreview.title ??
+                                                        "image_" + generateId()
+                                                    }
+                                                    className="size-full object-cover"
+                                                    width={500}
+                                                    height={500}
+                                                />
+                                            </div>
+                                        </div>
+                                    )
+                                )}
+
+                                <div className="absolute right-0 top-0 z-10">
+                                    <Button
+                                        size="icon"
+                                        variant="ghost"
+                                        className="rounded-full"
+                                        isDisabled={isLoading}
+                                        onClick={() =>
+                                            setIsPreviewVisible(false)
+                                        }
+                                    >
+                                        <Icons.close className="size-[14px]" />
+                                    </Button>
                                 </div>
                             </div>
                         ) : (
-                            <div className="flex items-center justify-between gap-2 rounded-xl bg-default-100 p-2">
+                            <div className="flex items-center justify-between gap-2 rounded-xl border bg-card p-2 pl-4">
                                 <p className="text-sm opacity-80">
                                     Link preview has been disabled
                                 </p>
                                 <Button
                                     size="sm"
-                                    color="primary"
+                                    variant="ghost"
                                     isDisabled={isLoading}
-                                    className="font-semibold text-white dark:text-black"
-                                    onPress={() => setIsPreviewVisible(true)}
+                                    onClick={() => setIsPreviewVisible(true)}
                                 >
                                     Show
                                 </Button>
@@ -359,26 +377,23 @@ function CreatePostPage({ user, className, ...props }: PageProps) {
                             {images.map((image) => (
                                 <div
                                     key={image.id}
-                                    className="group relative overflow-hidden"
+                                    className="group relative aspect-video overflow-hidden rounded-lg"
                                 >
-                                    <Image
+                                    <NextImage
                                         src={image.url}
                                         alt={image.file.name}
-                                        radius="sm"
-                                        className="aspect-video object-cover"
+                                        className="size-full object-cover"
+                                        width={500}
+                                        height={500}
                                     />
 
                                     <div className="absolute right-0 top-2 z-10 h-full translate-x-full transition-all ease-in-out group-hover:right-2 group-hover:translate-x-0">
                                         <Button
-                                            isIconOnly
-                                            size="sm"
-                                            className="h-6 w-6 min-w-unit-0"
-                                            radius="full"
+                                            size="icon"
+                                            variant="ghost"
+                                            className="rounded-full"
                                             isDisabled={isLoading}
-                                            startContent={
-                                                <Icons.close className="h-4 w-4 text-white" />
-                                            }
-                                            onPress={() =>
+                                            onClick={() =>
                                                 setImages((prev) =>
                                                     prev.filter(
                                                         (prevImage) =>
@@ -387,7 +402,9 @@ function CreatePostPage({ user, className, ...props }: PageProps) {
                                                     )
                                                 )
                                             }
-                                        />
+                                        >
+                                            <Icons.close className="size-4 drop-shadow-md" />
+                                        </Button>
                                     </div>
                                 </div>
                             ))}
@@ -403,11 +420,10 @@ function CreatePostPage({ user, className, ...props }: PageProps) {
                     )}
                 >
                     <Button
-                        radius="sm"
                         size="sm"
-                        className="font-semibold"
+                        variant="ghost"
                         isDisabled={!content || isLoading}
-                        onPress={() => {
+                        onClick={() => {
                             handleReset();
                             textareaRef.current?.focus();
                         }}
@@ -416,13 +432,14 @@ function CreatePostPage({ user, className, ...props }: PageProps) {
                     </Button>
 
                     <Button
-                        radius="sm"
                         size="sm"
-                        color="primary"
-                        className="font-semibold text-black"
                         isDisabled={!content || isLoading}
                         isLoading={isLoading}
-                        onPress={handleCreatePost}
+                        className="font-semibold"
+                        classNames={{
+                            startContent: "text-background",
+                        }}
+                        onClick={handleCreatePost}
                     >
                         Post
                     </Button>

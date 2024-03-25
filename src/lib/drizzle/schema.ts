@@ -1,32 +1,29 @@
-import { init } from "@paralleldrive/cuid2";
 import { InferInsertModel, InferSelectModel, relations } from "drizzle-orm";
 import {
+    boolean,
     index,
     json,
-    mysqlTable,
+    pgTable,
     text,
     timestamp,
     uniqueIndex,
-    varchar,
-} from "drizzle-orm/mysql-core";
+} from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import { generateId } from "../utils";
 import { PostAttachment, PostMetadata } from "../validation/post";
-
-const createId = init({
-    length: 25,
-});
 
 // SCHEMAS
 
-export const users = mysqlTable(
+export const users = pgTable(
     "post_it__users",
     {
-        id: varchar("id", { length: 25 })
+        id: text("id")
             .primaryKey()
             .notNull()
-            .$defaultFn(() => createId()),
-        username: varchar("username", { length: 50 }).notNull().unique(),
+            .$defaultFn(() => generateId()),
+        username: text("username").notNull().unique(),
         password: text("password").notNull(),
+        isFirstTime: boolean("is_first_time").notNull().default(true),
         createdAt: timestamp("created_at").notNull().defaultNow(),
     },
     (table) => {
@@ -36,22 +33,26 @@ export const users = mysqlTable(
     }
 );
 
-export const posts = mysqlTable(
+export const posts = pgTable(
     "post_it__posts",
     {
-        id: varchar("id", { length: 25 })
+        id: text("id")
             .primaryKey()
             .notNull()
-            .$defaultFn(() => createId()),
+            .$defaultFn(() => generateId()),
         content: text("content").notNull(),
         metadata: json("metadata").$type<PostMetadata>().default(null),
         attachments: json("attachments")
             .$type<PostAttachment[]>()
             .default([])
             .notNull(),
-        createdAt: timestamp("created_at").notNull().defaultNow(),
-        updatedAt: timestamp("updated_at").notNull().onUpdateNow().defaultNow(),
-        authorId: varchar("author_id", { length: 50 }).notNull(),
+        createdAt: timestamp("created_at", { withTimezone: true })
+            .notNull()
+            .defaultNow(),
+        updatedAt: timestamp("updated_at", { withTimezone: true })
+            .notNull()
+            .defaultNow(),
+        authorId: text("author_id").notNull(),
     },
     (table) => {
         return {

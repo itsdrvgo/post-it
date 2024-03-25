@@ -4,14 +4,14 @@ import "./env.mjs";
 const nextConfig = {
     images: {
         remotePatterns: [
-            { hostname: "**.discordapp.com" },
-            { hostname: "**.scdn.co" },
-            { hostname: "uploadthing.com" },
-            { hostname: "**.clerk.dev" },
             { hostname: "utfs.io" },
+            { hostname: "**.clerk.com" },
+            {
+                // all hosts available on web
+                hostname: "*",
+            },
         ],
     },
-    reactStrictMode: true,
 };
 
 export default nextConfig;

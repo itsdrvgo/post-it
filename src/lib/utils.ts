@@ -1,11 +1,12 @@
+import { init } from "@paralleldrive/cuid2";
 import { clsx, type ClassValue } from "clsx";
 import { DrizzleError } from "drizzle-orm";
 import { NextResponse } from "next/server";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import { twMerge } from "tailwind-merge";
 import { ZodError } from "zod";
 import { DEFAULT_ERROR_MESSAGE } from "../config/const";
-import { ResponseMessages } from "./validation/response";
+import { ResponseData, ResponseMessages } from "./validation/response";
 
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
@@ -14,7 +15,7 @@ export function cn(...inputs: ClassValue[]) {
 export const wait = (ms: number) =>
     new Promise((resolve) => setTimeout(resolve, ms));
 
-export function handleClientError(error: unknown, toastId?: string) {
+export function handleClientError(error: unknown, toastId?: string | number) {
     if (error instanceof DrizzleError) {
         return toast.error(error.message, {
             id: toastId,
@@ -69,7 +70,11 @@ export function CResponse<T>({
         case "OK":
             code = 200;
             break;
+        case "CREATED":
+            code = 201;
+            break;
         case "ERROR":
+        case "BAD_REQUEST":
             code = 400;
             break;
         case "UNAUTHORIZED":
@@ -81,14 +86,20 @@ export function CResponse<T>({
         case "NOT_FOUND":
             code = 404;
             break;
-        case "BAD_REQUEST":
-            code = 400;
+        case "CONFLICT":
+            code = 409;
+            break;
+        case "UNPROCESSABLE_ENTITY":
+            code = 422;
             break;
         case "TOO_MANY_REQUESTS":
             code = 429;
             break;
-        case "INTERNAL_SERVER_ERROR":
-            code = 500;
+        case "NOT_IMPLEMENTED":
+            code = 501;
+            break;
+        case "BAD_GATEWAY":
+            code = 502;
             break;
         case "SERVICE_UNAVAILABLE":
             code = 503;
@@ -96,32 +107,22 @@ export function CResponse<T>({
         case "GATEWAY_TIMEOUT":
             code = 504;
             break;
-        case "UNKNOWN_ERROR":
-            code = 500;
-            break;
-        case "UNPROCESSABLE_ENTITY":
-            code = 422;
-            break;
-        case "NOT_IMPLEMENTED":
-            code = 501;
-            break;
-        case "CREATED":
-            code = 201;
-            break;
-        case "BAD_GATEWAY":
-            code = 502;
-            break;
         default:
             code = 500;
             break;
     }
 
-    return NextResponse.json({
-        code,
-        message,
-        longMessage,
-        data,
-    });
+    return NextResponse.json(
+        {
+            message,
+            longMessage,
+            data,
+        },
+        {
+            status: code,
+            statusText: message,
+        }
+    );
 }
 
 export async function cFetch<T>(
@@ -140,10 +141,10 @@ export function convertMstoTimeElapsed(input: number) {
     if (elapsed < 60000) return "just now";
     else if (elapsed < 3600000) {
         const minutes = Math.floor(elapsed / 60000);
-        return `${minutes}m`;
+        return minutes + "m";
     } else if (elapsed < 86400000) {
         const hours = Math.floor(elapsed / 3600000);
-        return `${hours}h`;
+        return hours + "h";
     } else {
         const date = new Date(input);
         const currentDate = new Date();
@@ -151,7 +152,7 @@ export function convertMstoTimeElapsed(input: number) {
         const month = date.toLocaleString("default", { month: "short" });
         const day = date.getDate();
         const year = date.getFullYear();
-        return `${month} ${day}${isSameYear ? "" : `, ${year}`}`;
+        return month + " " + day + (isSameYear ? "" : ", " + year);
     }
 }
 
@@ -166,4 +167,30 @@ export function extractYTVideoId(url: string) {
     const params = new URLSearchParams(urlObj.search);
 
     return params.get("v");
+}
+
+export function getAbsoluteURL(path: string = "/") {
+    if (process.env.VERCEL_URL)
+        return "https://" + process.env.VERCEL_URL + path;
+    return "http://localhost:" + (process.env.PORT ?? 3000) + path;
+}
+
+export function generateId(length: number = 16) {
+    return init({ length })();
+}
+
+export async function getAccessToken() {
+    const res = await cFetch<
+        ResponseData<{
+            token: string;
+        }>
+    >("/api/token");
+
+    if (res.message !== "OK") throw new Error(res.longMessage);
+    if (!res.data?.token) throw new Error("Access token not found");
+    return res.data.token;
+}
+
+export function generatePostURL(postId: string) {
+    return getAbsoluteURL(`/posts?p=${postId}`);
 }
