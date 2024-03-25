@@ -6,13 +6,13 @@ A simple rip-off of social media apps like Twitter, Facebook, Instagram, etc. Th
 
 ## !! ⚠ Warning !!
 
--   **PLEASE DO NOT ENTER YOUR REAL PASSWORDS IN THE APP.** Even though the passwords are hashed, it is not safe to enter your real passwords. This is just a project to learn, we are not responsible for any data leaks.
+-   **PLEASE DO NOT ENTER YOUR REAL PASSWORDS IN THE APP.** Even though the passwords are hashed, it is not safe to enter your real passwords. This project is just for learning purposes and should not be used in production.
 
--   **WE DO NOT REGULATE THE CONTENT POSTED BY THE USERS.** We are not responsible for any content posted by the users.
+-   **WE DO NOT REGULATE THE CONTENT POSTED BY THE USERS REGULARLY.** We are not responsible for any content posted by the users. If you find any inappropriate content, please report it to us.
 
--   **WE DO NOT STORE ANY PERSONAL DATA.** We only store the username and the hashed password in the database. We do not store any other data.
+-   **WE DO NOT STORE ANY PERSONAL DATA.** We only store the username and your password as a hashed string. We do not store any other personal data.
 
--   **WE DO NOT USE COOKIES.** We do not use cookies to store any data. We only store the username and the hashed password in the browser's local storage.
+-   **WE DO NOT SELL YOUR DATA TO ANY THIRD-PARTY.** We do not sell your data to any third-party. We only use your data to provide you with the services.
 
 ## Tech Stack
 
@@ -20,11 +20,13 @@ A simple rip-off of social media apps like Twitter, Facebook, Instagram, etc. Th
 -   [React](https://reactjs.org/) - A JavaScript library for building user interfaces.
 -   [TailwindCSS](https://tailwindcss.com/) - A utility-first CSS framework for rapidly building custom designs.
 -   [Drizzle ORM](https://orm.drizzle.team/) - A simple ORM for interacting with the SQL databases.
--   [Planetscale MySQL](https://www.planetscale.com/) - A MySQL database hosted on the cloud.
+-   [Supabase PostgreSQL](https://supabase.com/) - A simple PostgreSQL database with a REST API.
 -   [Vercel](https://vercel.com/) - A cloud platform for static sites and Serverless Functions.
--   [NextUI](https://nextui.org/) - A React UI Library with 50+ Components for Next.js and Tailwind CSS.
+-   [ShadCN UI](https://ui.shadcn.com/) - A collection of UI components for React.
+-   [jose](https://github.com/panva/jose) - A JavaScript implementation of the JSON Object Signing and Encryption (JOSE) for JWTs.
 -   [tRPC](https://trpc.io/) - A TypeScript RPC framework for building reliable HTTP APIs with ease, on top of [Next.JS](https://nextjs.org/).
 -   [TanStack Query](https://tanstack.com/query/latest/) - A React Hooks for fetching, caching and updating asynchronous data in React.
+-   [React Hook Form](https://react-hook-form.com/) - Performant, flexible and extensible forms with easy-to-use validation.
 -   [UploadThing](https://uploadthing.com/) - A simple file upload API for your projects.
 
 ## Features
@@ -47,40 +49,43 @@ A simple rip-off of social media apps like Twitter, Facebook, Instagram, etc. Th
     -   Infinite scrolling to view more posts.
 
 -   **Authentication**
-    -   Simple authentication with username only.
-    -   Data is stored in the browser's local storage.
-    -   No need to login again after closing the browser.
-    -   Logout button to clear the data from the local storage.
-    -   Unique username is required to login.
+    -   Authentication with username and password.
+    -   JWT based authentication.
+    -   Auto-login with the JWT token.
+    -   Logout from the app.
+    -   Register a new account.
+    -   Single session login.
 
 ## Installation
 
-The repo uses [pnpm](https://pnpm.io/) as the package manager. You can use `npm` or `yarn` or `bun` as well.
+The repo uses [bun](https://bun.sh/) as the package manager. You can use `npm` or `yarn` if you want. But I recommend using `bun` as it is faster and more secure.
 
 ```bash
 # Clone the repo
 git clone https://github.com/itsdrvgo/post-it
 
 # Install the dependencies
-pnpm install
+bun i
 
 # Fill the environment variables
 # You can find the list of environment variables in .env.example file
-# Get your own API keys from https://uploadthing.com/ and https://www.planetscale.com/
+# Get your own API keys from https://uploadthing.com/ and https://supabase.com/
 cp .env.example .env
 
+# To know more about generating the access token and refresh token, visit https://github.com/itsdrvgo/nextjs-jwt-auth-example
+
 # Run the development server
-pnpm dev
+bun run dev
 ```
 
-The app should be up and running on [http://localhost:3000](http://localhost:3000).
+The app should be up and running on [localhost](http://localhost:3000).
 
 ```bash
 # Build the app for production
-pnpm build
+bun run build
 
 # Run the app in production mode
-pnpm start
+bun run start
 ```
 
 ## Contributing
@@ -89,15 +94,15 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 
 I didn't have much time to work on this project as we are already working on a similar project, and this was just a rip-off of that project. Thank you!
 
-Read more about contributing [here](https://github.com/itsdrvgo/post-it/blob/master/CONTRIBUTING.md).
+Read the [CONTRIBUTING.md](CONTRIBUTING.md) file for more information.
 
 ## License
 
-This project is licensed under the [MIT License](https://github.com/itsdrvgo/post-it/blob/master/LICENSE).
+This project is licensed under the [MIT License](LICENSE).
 
 ## Feedback
 
-Feel free to send me feedback on [X](https://x.com/itsdrvgo) or [file an issue](https://github.com/itsdrvgo/post-it/issues/new). Feature requests are always welcome. If you wish to contribute, please take a quick look at the [guidelines](https://github.com/itsdrvgo/post-it/blob/master/CONTRIBUTING.md)!
+Feel free to send me feedback on [X](https://x.com/itsdrvgo) or file an issue. Feature requests are always welcome. If you wish to contribute, please take a quick look at the [CONTRIBUTING.md](CONTRIBUTING.md) file.
 
 ## Connect with me
 
