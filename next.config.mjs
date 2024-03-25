@@ -7,7 +7,6 @@ const nextConfig = {
             { hostname: "utfs.io" },
             { hostname: "**.clerk.com" },
             {
-                // all hosts available on web
                 hostname: "*",
             },
         ],

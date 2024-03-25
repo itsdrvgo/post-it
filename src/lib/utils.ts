@@ -170,9 +170,15 @@ export function extractYTVideoId(url: string) {
 }
 
 export function getAbsoluteURL(path: string = "/") {
+    if (typeof window !== "undefined") {
+        if (process.env.NEXT_PUBLIC_VERCEL_URL)
+            return `https://${process.env.NEXT_PUBLIC_VERCEL_URL}${path}`;
+        return `http://localhost:${process.env.NEXT_PUBLIC_PORT ?? 3000}${path}`;
+    }
+
     if (process.env.VERCEL_URL)
-        return "https://" + process.env.VERCEL_URL + path;
-    return "http://localhost:" + (process.env.PORT ?? 3000) + path;
+        return `https://${process.env.VERCEL_URL}${path}`;
+    return `http://localhost:${process.env.PORT ?? 3000}${path}`;
 }
 
 export function generateId(length: number = 16) {
