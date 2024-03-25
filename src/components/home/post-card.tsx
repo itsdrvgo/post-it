@@ -234,7 +234,11 @@ function PostCard({ post, user, className, ...props }: PageProps) {
                                 <div
                                     className={cn(
                                         "p-4",
-                                        "col-span-full md:col-span-3",
+                                        "col-span-full",
+                                        !isYouTubeVideo(post.metadata.url) &&
+                                            "md:col-span-3",
+                                        isYouTubeVideo(post.metadata.url) &&
+                                            "order-2",
                                         post.metadata.title &&
                                             post.metadata.description &&
                                             "space-y-1"

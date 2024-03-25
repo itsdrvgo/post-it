@@ -280,7 +280,11 @@ function CreatePostPage({ user, className, ...props }: PageProps) {
                                 <div
                                     className={cn(
                                         "p-4",
-                                        "col-span-full md:col-span-3",
+                                        "col-span-full",
+                                        !isYouTubeVideo(linkPreview.url) &&
+                                            "md:col-span-3",
+                                        isYouTubeVideo(linkPreview.url) &&
+                                            "order-2",
                                         linkPreview.title &&
                                             linkPreview.description &&
                                             "space-y-1"
