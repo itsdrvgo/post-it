@@ -16,8 +16,8 @@ function ImageViewModal({ isOpen, setIsOpen, trigger, image }: PageProps) {
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             {trigger}
 
-            <DialogContent className="w-full max-w-full border-none !bg-transparent p-0 !pr-0 sm:max-w-full md:w-auto">
-                <NextImage src={image} alt="Image" width={1000} height={1000} />
+            <DialogContent className="flex max-w-full items-center justify-center border-none bg-transparent p-0 shadow-none">
+                <NextImage src={image} alt="Image" width={500} height={500} />
             </DialogContent>
         </Dialog>
     );
