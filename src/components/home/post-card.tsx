@@ -209,12 +209,20 @@ function PostCard({ post, user, className, ...props }: PageProps) {
                     </div>
 
                     <p className="text-sm md:text-base">
-                        {post.content.split("\n").map((line, i) => (
-                            <span key={i}>
-                                {sanitizeContent(line)}
-                                <br />
-                            </span>
-                        ))}
+                        {post.content.split("\n").map((line, i) => {
+                            const isLongWord =
+                                line.indexOf(" ") === -1 && line.length > 20;
+
+                            return (
+                                <span
+                                    key={i}
+                                    className={cn(isLongWord && "break-all")}
+                                >
+                                    {sanitizeContent(line)}
+                                    <br />
+                                </span>
+                            );
+                        })}
                     </p>
 
                     {post.metadata &&
