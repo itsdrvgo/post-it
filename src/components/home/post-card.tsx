@@ -225,15 +225,16 @@ function PostCard({ post, user, className, ...props }: PageProps) {
                                 isExternal
                                 href={post.metadata.url}
                                 className={cn(
-                                    "relative flex gap-2 overflow-hidden rounded-lg border bg-card",
+                                    "relative grid gap-2 overflow-hidden rounded-lg border bg-card",
                                     isYouTubeVideo(post.metadata.url)
-                                        ? "flex-col-reverse"
-                                        : "flex-row"
+                                        ? "grid-flow-row"
+                                        : "grid-cols-5"
                                 )}
                             >
                                 <div
                                     className={cn(
-                                        "basis-4/5 p-4 md:basis-3/5",
+                                        "p-4",
+                                        "col-span-full md:col-span-3",
                                         post.metadata.title &&
                                             post.metadata.description &&
                                             "space-y-1"
@@ -271,8 +272,12 @@ function PostCard({ post, user, className, ...props }: PageProps) {
                                     />
                                 ) : (
                                     post.metadata.image && (
-                                        <div className="flex aspect-square basis-1/5 md:aspect-auto md:basis-2/5">
-                                            <div className="md:basis-1/2"></div>
+                                        <div
+                                            className={cn(
+                                                "h-full justify-end md:flex",
+                                                "col-span-2 hidden"
+                                            )}
+                                        >
                                             <div className="aspect-square basis-1/2">
                                                 <NextImage
                                                     src={post.metadata.image}

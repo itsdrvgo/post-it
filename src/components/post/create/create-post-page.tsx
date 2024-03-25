@@ -271,15 +271,16 @@ function CreatePostPage({ user, className, ...props }: PageProps) {
                         (isPreviewVisible ? (
                             <div
                                 className={cn(
-                                    "relative flex gap-2 overflow-hidden rounded-lg border bg-card",
+                                    "relative grid gap-2 overflow-hidden rounded-lg border bg-card",
                                     isYouTubeVideo(linkPreview.url)
-                                        ? "flex-col-reverse"
-                                        : "flex-row"
+                                        ? "grid-flow-row"
+                                        : "grid-cols-5"
                                 )}
                             >
                                 <div
                                     className={cn(
-                                        "basis-4/5 p-4 md:basis-3/5",
+                                        "p-4",
+                                        "col-span-full md:col-span-3",
                                         linkPreview.title &&
                                             linkPreview.description &&
                                             "space-y-1"
@@ -316,8 +317,12 @@ function CreatePostPage({ user, className, ...props }: PageProps) {
                                     />
                                 ) : (
                                     linkPreview.image && (
-                                        <div className="flex aspect-square basis-1/5 md:aspect-auto md:basis-2/5">
-                                            <div className="md:basis-1/2"></div>
+                                        <div
+                                            className={cn(
+                                                "h-full justify-end md:flex",
+                                                "col-span-2 hidden"
+                                            )}
+                                        >
                                             <div className="aspect-square basis-1/2">
                                                 <NextImage
                                                     src={linkPreview.image}
