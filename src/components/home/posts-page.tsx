@@ -66,6 +66,7 @@ function PostsPage({ user, className, ...props }: PageProps) {
                                     key={post.id}
                                     className="w-full"
                                     href={`/posts?p=${post.id}`}
+                                    onClick={(e) => e.preventDefault()}
                                 >
                                     <PostCard post={post} user={user} />
                                 </Link>
@@ -75,6 +76,7 @@ function PostsPage({ user, className, ...props }: PageProps) {
                                     key={post.id}
                                     className="w-full"
                                     href={`/posts?p=${post.id}`}
+                                    onClick={(e) => e.preventDefault()}
                                 >
                                     <PostCard post={post} user={user} />
                                 </Link>
