@@ -3,7 +3,7 @@
 import { cn } from "@/lib/utils";
 import { GenericProps } from "@/types";
 import { forwardRef, ReactNode } from "react";
-import { Icons } from "../icons/icons";
+import { Icons } from "../icons";
 
 interface EmptyPlaceholderProps extends GenericProps {
     title: string;

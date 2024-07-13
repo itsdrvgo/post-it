@@ -1,9 +1,9 @@
 import "./globals.css";
+import { ClientProvider } from "@/components/providers";
 import { Toaster } from "@/components/ui/sonner";
 import { siteConfig } from "@/config/site";
 import { Metadata } from "next";
 import { Titillium_Web } from "next/font/google";
-import ClientProvider from "../components/providers/client";
 import { cn, getAbsoluteURL } from "../lib/utils";
 import { LayoutProps } from "../types";
 

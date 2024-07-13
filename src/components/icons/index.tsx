@@ -1,10 +1,11 @@
 import {
     AlarmClock,
     AlertTriangle,
-    ArrowBigDown,
-    ArrowBigUp,
+    ArrowDown,
     ArrowLeft,
     ArrowRight,
+    ArrowUp,
+    ArrowUpDown,
     Asterisk,
     BarChart,
     BarChart2,
@@ -103,6 +104,7 @@ import {
     Settings,
     Share2,
     Shield,
+    SlidersHorizontal,
     Smile,
     Sparkles,
     SunMedium,
@@ -133,6 +135,8 @@ import {
 export type Icon = LucideIcon;
 
 export const Icons = {
+    sliderHor: SlidersHorizontal,
+    arrowUpDown: ArrowUpDown,
     dot: Dot,
     cross: X,
     externalLink: ExternalLink,
@@ -236,8 +240,8 @@ export const Icons = {
     moreVert: MoreVertical,
     loader: LucideLoader2,
     refresh: RefreshCw,
-    arrowUp: ArrowBigUp,
-    arrowDown: ArrowBigDown,
+    arrowUp: ArrowUp,
+    arrowDown: ArrowDown,
     bold: Bold,
     italic: Italic,
     underline: Underline,

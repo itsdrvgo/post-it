@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 import { LucideProps } from "lucide-react";
-import { Icons } from "../icons/icons";
+import { Icons } from "../icons";
 
 export function Spinner({ className, ...props }: LucideProps) {
     return (

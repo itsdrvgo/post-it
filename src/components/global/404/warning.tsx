@@ -6,7 +6,7 @@ interface PageProps extends GenericProps {
     content: string;
 }
 
-function Warning({ content, className, ...props }: PageProps) {
+export function Warning({ content, className, ...props }: PageProps) {
     return (
         <div
             className={cn(
@@ -29,5 +29,3 @@ function Warning({ content, className, ...props }: PageProps) {
         </div>
     );
 }
-
-export default Warning;

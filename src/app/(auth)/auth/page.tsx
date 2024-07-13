@@ -1,5 +1,5 @@
 import AuthPage from "@/components/auth/auth-page";
-import { AuthShell } from "@/components/global/shells/auth-shell";
+import { AuthShell } from "@/components/global/layouts";
 
 function Page() {
     return (

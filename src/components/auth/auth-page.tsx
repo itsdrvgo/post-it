@@ -2,14 +2,14 @@
 
 import { trpc } from "@/lib/trpc/client";
 import { handleClientError } from "@/lib/utils";
+import { SignInData, signinSchema } from "@/lib/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { generate } from "generate-password";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { z } from "zod";
-import { Icons } from "../icons/icons";
+import { Icons } from "../icons";
 import { Button } from "../ui/button";
 import {
     Card,
@@ -34,27 +34,6 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "../ui/tooltip";
-
-const signinSchema = z.object({
-    username: z
-        .string()
-        .min(3, "Username is too short")
-        .max(32, "Username is too long")
-        .regex(
-            /^[a-z0-9_]+$/,
-            "Username can only contain lowercase letters, numbers, underscores"
-        ),
-    password: z
-        .string()
-        .min(8, "Password is too short")
-        .max(64, "Password is too long")
-        .regex(
-            /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])[\S]+$/,
-            "Password must contain at least one lowercase letter, one uppercase letter, and one number"
-        ),
-});
-
-type SignInData = z.infer<typeof signinSchema>;
 
 function AuthPage() {
     const router = useRouter();
@@ -88,7 +67,7 @@ function AuthPage() {
                 router.push("/");
             },
             onError: (err, _, ctx) => {
-                handleClientError(err, ctx?.toastId);
+                return handleClientError(err, ctx?.toastId);
             },
         });
 

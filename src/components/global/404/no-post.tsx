@@ -1,6 +1,6 @@
 import { EmptyPlaceholder } from "@/components/ui/empty-placeholder";
 
-function NoPostPage() {
+export function NoPostPage() {
     return (
         <div className="flex justify-center p-5">
             <EmptyPlaceholder
@@ -11,5 +11,3 @@ function NoPostPage() {
         </div>
     );
 }
-
-export default NoPostPage;

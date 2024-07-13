@@ -11,7 +11,12 @@ interface PageProps {
     trigger: ReactNode;
 }
 
-function ImageViewModal({ isOpen, setIsOpen, trigger, image }: PageProps) {
+export function ViewImageModal({
+    isOpen,
+    setIsOpen,
+    trigger,
+    image,
+}: PageProps) {
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             {trigger}
@@ -22,5 +27,3 @@ function ImageViewModal({ isOpen, setIsOpen, trigger, image }: PageProps) {
         </Dialog>
     );
 }
-
-export default ImageViewModal;

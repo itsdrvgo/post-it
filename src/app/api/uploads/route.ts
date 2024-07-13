@@ -1,9 +1,17 @@
 import { verifyAccessToken } from "@/lib/jwt";
+import { getPreferences } from "@/lib/redis/methods";
 import { CResponse } from "@/lib/utils";
 import { NextRequest } from "next/server";
 import { utapi } from "../uploadthing/core";
 
 export async function POST(req: NextRequest) {
+    const preferences = await getPreferences();
+    if (preferences && !preferences.isPostCreateEnabled)
+        return CResponse({
+            message: "FORBIDDEN",
+            longMessage: "Post creation is disabled",
+        });
+
     const accessToken = req.headers.get("Authorization")?.split(" ")[1];
     if (!accessToken)
         return CResponse({

@@ -65,13 +65,16 @@ export function CResponse<T>({
     data?: T;
 }) {
     let code: number;
+    let success = false;
 
     switch (message) {
         case "OK":
             code = 200;
+            success = true;
             break;
         case "CREATED":
             code = 201;
+            success = true;
             break;
         case "ERROR":
         case "BAD_REQUEST":
@@ -114,6 +117,7 @@ export function CResponse<T>({
 
     return NextResponse.json(
         {
+            success,
             message,
             longMessage,
             data,
@@ -195,4 +199,21 @@ export async function getAccessToken() {
 
 export function generatePostURL(postId: string) {
     return getAbsoluteURL(`/posts?p=${postId}`);
+}
+
+export function generatePathTitle(path: string = "/admin/users") {
+    const split = path.split("/");
+    const title = split[split.length - 1];
+    return title.charAt(0).toUpperCase() + title.slice(1);
+}
+
+export function shortenNumber(num: number): string {
+    const units = ["", "K", "M", "B", "T"];
+    let unitIndex = 0;
+    while (num >= 1000 && unitIndex < units.length - 1) {
+        num /= 1000;
+        unitIndex++;
+    }
+    const formattedNum = num % 1 === 0 ? num.toFixed(0) : num.toFixed(1);
+    return formattedNum + units[unitIndex];
 }

@@ -45,3 +45,9 @@ declare global {
               error: UploadError;
           };
 }
+
+export interface ProfanityResponse {
+    isProfanity: boolean;
+    score: number;
+    flaggedFor: string;
+}

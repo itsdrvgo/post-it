@@ -1,10 +1,8 @@
 {
-  "id": "b67610c9-eb5e-4dab-bc24-cf79801bfca6",
-  "prevId": "0ff013c0-32a8-4f7d-b849-6221cb5f0c6c",
-  "version": "5",
-  "dialect": "pg",
+  "version": "7",
+  "dialect": "postgresql",
   "tables": {
-    "post_it__posts": {
+    "public.post_it__posts": {
       "name": "post_it__posts",
       "schema": "",
       "columns": {
@@ -57,25 +55,41 @@
       },
       "indexes": {
         "author_id_idx": {
-          "name": "author_id_idx",
           "columns": [
-            "author_id"
+            {
+              "expression": "author_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
-          "isUnique": false
+          "with": {},
+          "name": "author_id_idx",
+          "isUnique": false,
+          "method": "btree",
+          "concurrently": false
         },
         "created_at_idx": {
-          "name": "created_at_idx",
           "columns": [
-            "created_at"
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
-          "isUnique": false
+          "with": {},
+          "name": "created_at_idx",
+          "isUnique": false,
+          "method": "btree",
+          "concurrently": false
         }
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "post_it__users": {
+    "public.post_it__users": {
       "name": "post_it__users",
       "schema": "",
       "columns": {
@@ -114,11 +128,19 @@
       },
       "indexes": {
         "username_idx": {
-          "name": "username_idx",
           "columns": [
-            "username"
+            {
+              "expression": "username",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
-          "isUnique": true
+          "with": {},
+          "name": "username_idx",
+          "isUnique": true,
+          "method": "btree",
+          "concurrently": false
         }
       },
       "foreignKeys": {},
@@ -126,10 +148,10 @@
       "uniqueConstraints": {
         "post_it__users_username_unique": {
           "name": "post_it__users_username_unique",
-          "nullsNotDistinct": false,
           "columns": [
             "username"
-          ]
+          ],
+          "nullsNotDistinct": false
         }
       }
     }
@@ -137,8 +159,10 @@
   "enums": {},
   "schemas": {},
   "_meta": {
-    "columns": {},
     "schemas": {},
-    "tables": {}
-  }
+    "tables": {},
+    "columns": {}
+  },
+  "id": "b67610c9-eb5e-4dab-bc24-cf79801bfca6",
+  "prevId": "0ff013c0-32a8-4f7d-b849-6221cb5f0c6c"
 }

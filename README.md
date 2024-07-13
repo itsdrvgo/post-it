@@ -1,6 +1,6 @@
 # **POST IT**
 
-A simple rip-off of social media apps like Twitter, Facebook, Instagram, etc. This is a project to learn the basics of `Next.JS`, `React`, `TailwindCSS` & `Drizzle ORM`.
+A simple rip-off of social media apps like Twitter, Facebook, Instagram, etc. This is a project to learn the basics of `Next.JS`, `React`, `tRPC`, `JWT`, & `Drizzle ORM`.
 
 ![og](public/og.webp)
 
@@ -8,11 +8,18 @@ A simple rip-off of social media apps like Twitter, Facebook, Instagram, etc. Th
 
 -   **PLEASE DO NOT ENTER YOUR REAL PASSWORDS IN THE APP.** Even though the passwords are hashed, it is not safe to enter your real passwords. This project is just for learning purposes and should not be used in production.
 
--   **WE DO NOT REGULATE THE CONTENT POSTED BY THE USERS REGULARLY.** We are not responsible for any content posted by the users. If you find any inappropriate content, please report it to us.
+-   **WE DO NOT REGULARLY REGULATE THE CONTENT POSTED BY THE USERS REGULARLY.** We are not responsible for any content posted by the users. If you find any inappropriate content, please report it to us. The content is auto-filtered by our Profanity Filter, but it is not 100% accurate.
 
 -   **WE DO NOT STORE ANY PERSONAL DATA.** We only store the username and your password as a hashed string. We do not store any other personal data.
 
 -   **WE DO NOT SELL YOUR DATA TO ANY THIRD-PARTY.** We do not sell your data to any third-party. We only use your data to provide you with the services.
+
+## !! ⚠ KNOWN ISSUES & TO-DOs !!
+
+-   The Users table in `/admin/users` does not work as expected. Even though the API is configured correctly, upon clicking the next page, the data is not displayed properly.
+    -   Apparantly, there is a bug rendering the data in the table. As ShadCN does not natively provide asynchronous data rendering, we have to find a workaround for this issue.
+    -   Whenever the next page button is clicked, if previewed on `Network` tab, the next 10 users are fetched correctly, but in the UI, the first 10 users are displayed again.
+-   Once this issue is fixed, we have to add option to promote, demote, restrict, unrestrict, and delete a user from the admin panel.
 
 ## Tech Stack
 
@@ -28,6 +35,7 @@ A simple rip-off of social media apps like Twitter, Facebook, Instagram, etc. Th
 -   [TanStack Query](https://tanstack.com/query/latest/) - A React Hooks for fetching, caching and updating asynchronous data in React.
 -   [React Hook Form](https://react-hook-form.com/) - Performant, flexible and extensible forms with easy-to-use validation.
 -   [UploadThing](https://uploadthing.com/) - A simple file upload API for your projects.
+-   [Profanity API](https://profanity.dev/) - A simple `FREE` API to detect profanity in the text.
 
 ## Features
 
@@ -39,6 +47,10 @@ A simple rip-off of social media apps like Twitter, Facebook, Instagram, etc. Th
     -   Auto-detects links in the post and converts them to clickable links.
     -   Auto-embeds YouTube videos in the post.
     -   Auto-embeds links to images in the post.
+    -   Profanity Filter.
+        -   Auto-detects profanity in the post.
+        -   Marks the post as `pending` if profanity is detected.
+        -   Admin can approve or reject the post.
 
 -   **View Post**
 
@@ -48,13 +60,39 @@ A simple rip-off of social media apps like Twitter, Facebook, Instagram, etc. Th
     -   View the links in the post.
     -   Infinite scrolling to view more posts.
 
--   **Authentication**
+-   **Role-based Authentication**
+
     -   Authentication with username and password.
-    -   JWT based authentication.
+    -   JWT & Role based authentication.
     -   Auto-login with the JWT token.
     -   Logout from the app.
     -   Register a new account.
     -   Single session login.
+        -   If you login from another device, the session on the previous device will be invalidated.
+    -   Refresh token.
+        -   If the access token expires, the refresh token will be used to generate a new access token.
+        -   The refresh token will be invalidated if the user logs out.
+
+-   **Dedicated User Profile**
+
+    -   View your own profile.
+    -   View your own posts.
+    -   Change your password & username.
+    -   Delete your account.
+
+-   **Admin Panel**
+    -   Users Page
+        -   Display all the users in the app.
+        -   Promote or demote a user, (USER, MOD, ADMIN).
+        -   Restrict or unrestrict a user.
+        -   Delete a user.
+    -   Posts Page
+        -   Show posts marked as `pending` by Auto-Profanity Filter.
+        -   Approve or reject a post.
+        -   Mass approve or reject posts.
+    -   Site Preferences
+        -   Manage whether new users can register or not.
+        -   Manage whether users can post or not.
 
 ## Installation
 

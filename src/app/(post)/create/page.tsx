@@ -1,5 +1,5 @@
-import CreateFetch from "@/components/post/create/create-fetch";
-import Loader from "@/components/ui/loader";
+import { CreateFetch } from "@/components/post";
+import { Loader } from "@/components/ui/loader";
 import { Suspense } from "react";
 
 function Page() {

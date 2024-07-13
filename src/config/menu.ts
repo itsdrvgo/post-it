@@ -1,4 +1,4 @@
-import { Icons } from "@/components/icons/icons";
+import { Icons } from "@/components/icons";
 
 interface Menu {
     name: string;

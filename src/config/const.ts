@@ -7,6 +7,7 @@ export const DEFAULT_IP = "127.0.0.1";
 export const APP_ID = "pi_gowhb09hfb";
 export const PAGES = {
     AUTH_PAGE: "/auth",
+    ADMIN_PAGE: "/admin",
 };
 
 // ATTACHMENTS
@@ -26,3 +27,19 @@ export const TOKENS = {
     ACCESS_COOKIE_NAME: APP_ID + "__access_token",
     CACHED_AUTH_KEY: APP_ID + "__cached_auth_token",
 };
+
+export const CACHED_PREFERENCES_KEY = APP_ID + "__cached_preferences";
+
+// ROLES
+export enum ROLES {
+    ADMIN = "admin",
+    MOD = "mod",
+    USER = "user",
+}
+
+// POSTS
+export enum POST_STATUS {
+    APPROVED = "approved",
+    PENDING = "pending",
+    REJECTED = "rejected",
+}

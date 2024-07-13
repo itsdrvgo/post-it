@@ -1,21 +1,19 @@
 "use client";
 
 import { trpc } from "@/lib/trpc/client";
-import { cn } from "@/lib/utils";
 import { UserClientData } from "@/lib/validation/user";
-import { GenericProps } from "@/types";
 import { useIntersection } from "@mantine/hooks";
 import { useEffect, useMemo, useRef } from "react";
 import { Link } from "../ui/link";
-import Loader from "../ui/loader";
+import { Loader } from "../ui/loader";
 import { Separator } from "../ui/separator";
 import PostCard from "./post-card";
 
-interface PageProps extends GenericProps {
+interface PageProps {
     user: UserClientData;
 }
 
-function PostsPage({ user, className, ...props }: PageProps) {
+function PostsPage({ user }: PageProps) {
     const {
         data: postsRaw,
         isLoading,
@@ -25,6 +23,7 @@ function PostsPage({ user, className, ...props }: PageProps) {
         {},
         {
             getNextPageParam: (lastPage) => lastPage.nextCursor,
+            refetchInterval: 1000 * 60 * 10,
         }
     );
 
@@ -50,7 +49,7 @@ function PostsPage({ user, className, ...props }: PageProps) {
     );
 
     return (
-        <div className={cn("w-full max-w-2xl space-y-4", className)} {...props}>
+        <div className="relative space-y-4">
             {isLoading ? (
                 <div className="flex justify-center">
                     <Loader />
@@ -64,6 +63,7 @@ function PostsPage({ user, className, ...props }: PageProps) {
                                     type="link"
                                     ref={ref}
                                     key={post.id}
+                                    id={post.id}
                                     className="w-full"
                                     href={`/posts?p=${post.id}`}
                                     onClick={(e) => e.preventDefault()}
@@ -74,6 +74,7 @@ function PostsPage({ user, className, ...props }: PageProps) {
                                 <Link
                                     type="link"
                                     key={post.id}
+                                    id={post.id}
                                     className="w-full"
                                     href={`/posts?p=${post.id}`}
                                     onClick={(e) => e.preventDefault()}

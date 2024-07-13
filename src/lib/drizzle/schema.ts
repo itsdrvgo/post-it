@@ -1,3 +1,4 @@
+import { POST_STATUS, ROLES } from "@/config/const";
 import { InferInsertModel, InferSelectModel, relations } from "drizzle-orm";
 import {
     boolean,
@@ -24,6 +25,8 @@ export const users = pgTable(
         username: text("username").notNull().unique(),
         password: text("password").notNull(),
         isFirstTime: boolean("is_first_time").notNull().default(true),
+        role: text("role").$type<ROLES>().notNull().default(ROLES.USER),
+        isRestricted: boolean("is_restricted").notNull().default(false),
         createdAt: timestamp("created_at").notNull().defaultNow(),
     },
     (table) => {
@@ -46,6 +49,10 @@ export const posts = pgTable(
             .$type<PostAttachment[]>()
             .default([])
             .notNull(),
+        status: text("status")
+            .$type<POST_STATUS>()
+            .notNull()
+            .default(POST_STATUS.PENDING),
         createdAt: timestamp("created_at", { withTimezone: true })
             .notNull()
             .defaultNow(),

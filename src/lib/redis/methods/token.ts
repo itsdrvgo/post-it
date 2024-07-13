@@ -1,5 +1,5 @@
-import { redis } from "../..";
-import { generateAuthTokenCacheKey } from "../../util";
+import { redis } from "..";
+import { generateAuthTokenCacheKey } from "../util";
 
 export async function addAuthTokenToCache(token: string, userId: string) {
     const key = generateAuthTokenCacheKey(userId);

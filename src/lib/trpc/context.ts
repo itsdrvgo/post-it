@@ -5,7 +5,7 @@ import { cookies } from "next/headers";
 import { db } from "../drizzle";
 import { posts, User, users } from "../drizzle/schema";
 import { verifyAuthToken } from "../jwt";
-import { isAuthTokenInCache } from "../redis/methods/token";
+import { isAuthTokenInCache } from "../redis/methods";
 
 type ContextProps = {
     user: User | null;

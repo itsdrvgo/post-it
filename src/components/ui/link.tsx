@@ -5,7 +5,7 @@ import { VariantProps } from "class-variance-authority";
 import { ClassValue } from "class-variance-authority/types";
 import NextLink, { LinkProps as NextLinkProps } from "next/link";
 import { forwardRef, ReactNode } from "react";
-import { Icons } from "../icons/icons";
+import { Icons } from "../icons";
 import { buttonVariants } from "./button";
 
 type ButtonLinkProps = {
@@ -24,6 +24,7 @@ type LinkProps = NextLinkProps &
         className?: ClassValue;
         isExternal?: boolean;
         showAnchorIcon?: boolean;
+        id?: string;
         children: ReactNode;
     };
 

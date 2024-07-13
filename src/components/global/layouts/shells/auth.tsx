@@ -1,5 +1,5 @@
 import { LayoutProps } from "@/types";
-import Warning from "../404/warning";
+import { Warning } from "../../404";
 
 export function AuthShell({ children }: LayoutProps) {
     return (

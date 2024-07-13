@@ -21,6 +21,7 @@ export const responseMessages = z.union([
 
 const responseSchema = <DataType extends z.ZodTypeAny>(dataType: DataType) =>
     z.object({
+        success: z.boolean(),
         message: responseMessages,
         longMessage: z.string().optional(),
         data: dataType.optional(),

@@ -1,3 +1,4 @@
+import { GeneralShell } from "@/components/global/layouts";
 import ProfileFetch from "@/components/profile/profile-fetch";
 import { Metadata } from "next";
 
@@ -8,9 +9,9 @@ export const metadata: Metadata = {
 
 function Page() {
     return (
-        <section className="flex w-full justify-center p-5">
+        <GeneralShell>
             <ProfileFetch />
-        </section>
+        </GeneralShell>
     );
 }
 

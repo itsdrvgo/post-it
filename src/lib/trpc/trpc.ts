@@ -1,3 +1,4 @@
+import { ROLES } from "@/config/const";
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
@@ -99,8 +100,26 @@ const isAccessTokenValid = t.middleware(async ({ ctx, next }) => {
     });
 });
 
+const isAdmin = t.middleware(async ({ ctx, next }) => {
+    const { user } = ctx;
+
+    if (!user || user.role !== ROLES.ADMIN)
+        throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "You're not authorized",
+        });
+
+    return next({
+        ctx: {
+            ...ctx,
+            user,
+        },
+    });
+});
+
 export const createTRPCRouter = t.router;
 export const publicProcedure = t.procedure.use(ratelimiter);
 export const protectedProcedure = publicProcedure.use(isAuth);
 export const protectedProcedureWithAccessToken =
     protectedProcedure.use(isAccessTokenValid);
+export const adminOnlyProcedure = protectedProcedure.use(isAdmin);

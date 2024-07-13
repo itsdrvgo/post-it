@@ -1,3 +1,4 @@
+import { NoPostPage } from "@/components/global/404";
 import PostCard from "@/components/home/post-card";
 import { PAGES, TOKENS } from "@/config/const";
 import { db } from "@/lib/drizzle";
@@ -8,7 +9,6 @@ import { GenericProps } from "@/types";
 import { eq } from "drizzle-orm";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import NoPostPage from "../../global/404/no-post";
 
 interface PageProps extends GenericProps {
     searchParams: {
@@ -16,7 +16,11 @@ interface PageProps extends GenericProps {
     };
 }
 
-async function PostFetch({ searchParams, className, ...props }: PageProps) {
+export async function PostFetch({
+    searchParams,
+    className,
+    ...props
+}: PageProps) {
     const cookieStore = cookies();
     const authToken = cookieStore.get(TOKENS.AUTH_COOKIE_NAME)?.value;
     if (!authToken) redirect(PAGES.AUTH_PAGE);
@@ -46,6 +50,8 @@ async function PostFetch({ searchParams, className, ...props }: PageProps) {
             username: post.author.username,
             isFirstTime: post.author.isFirstTime,
             createdAt: post.author.createdAt,
+            isRestricted: post.author.isRestricted,
+            role: post.author.role,
         },
     };
 
@@ -60,5 +66,3 @@ async function PostFetch({ searchParams, className, ...props }: PageProps) {
         />
     );
 }
-
-export default PostFetch;

@@ -1,7 +1,7 @@
 "use client";
 
-import { Icons } from "@/components/icons/icons";
-import { setToken } from "@/components/providers/client";
+import { Icons } from "@/components/icons";
+import { setToken } from "@/components/providers";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Link } from "@/components/ui/link";
 import { User } from "@/components/ui/user";
-import { DEFAULT_IMAGE_URL } from "@/config/const";
+import { DEFAULT_IMAGE_URL, ROLES } from "@/config/const";
 import { menu } from "@/config/menu";
 import { trpc } from "@/lib/trpc/client";
 import { cn, getAccessToken, handleClientError } from "@/lib/utils";
@@ -23,7 +23,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
-function Navbar() {
+export function Navbar() {
     const router = useRouter();
 
     const [isMenuHidden, setIsMenuHidden] = useState(false);
@@ -52,7 +52,7 @@ function Navbar() {
                 router.push("/auth");
             },
             onError: (err, _, ctx) => {
-                handleClientError(err, ctx?.toastId);
+                return handleClientError(err, ctx?.toastId);
             },
         });
 
@@ -63,7 +63,7 @@ function Navbar() {
 
             signOut();
         } catch (err) {
-            handleClientError(err);
+            return handleClientError(err);
         }
     };
 
@@ -168,8 +168,24 @@ function Navbar() {
                                         onSelect={() => router.push("/profile")}
                                     >
                                         <Icons.dashboard className="size-4" />
-                                        <span>Your Posts</span>
+                                        <span>Profile</span>
                                     </DropdownMenuItem>
+
+                                    {data.user.role !== ROLES.USER && (
+                                        <>
+                                            <DropdownMenuSeparator />
+
+                                            <DropdownMenuItem
+                                                className="gap-2"
+                                                onSelect={() =>
+                                                    router.push("/admin")
+                                                }
+                                            >
+                                                <Icons.user className="size-4" />
+                                                <span>Admin Panel</span>
+                                            </DropdownMenuItem>
+                                        </>
+                                    )}
 
                                     <DropdownMenuSeparator />
 
@@ -267,5 +283,3 @@ function Navbar() {
         </>
     );
 }
-
-export default Navbar;

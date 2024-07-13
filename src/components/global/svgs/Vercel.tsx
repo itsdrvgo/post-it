@@ -1,6 +1,6 @@
 import { SVGProps } from "react";
 
-function Vercel({
+export function Vercel({
     width,
     height,
     className,
@@ -24,5 +24,3 @@ function Vercel({
         </svg>
     );
 }
-
-export default Vercel;

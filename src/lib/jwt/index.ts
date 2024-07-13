@@ -1,5 +1,5 @@
 import { env } from "@/../env.mjs";
-import { decodeJwt, errors, jwtVerify, SignJWT } from "jose";
+import { decodeJwt, errors, JWTPayload, jwtVerify, SignJWT } from "jose";
 import { generateId } from "../utils";
 
 export function generateAccessToken(userId: string) {
@@ -15,7 +15,7 @@ export function generateAccessToken(userId: string) {
 }
 
 export function generateAuthToken(userId: string) {
-    const jwt = new SignJWT({})
+    const jwt = new SignJWT()
         .setProtectedHeader({ alg: "HS256" })
         .setJti(generateId())
         .setIssuedAt()
@@ -79,10 +79,10 @@ export async function verifyAccessToken(accessToken: string) {
     }
 }
 
-export function decodeAuthToken(token: string) {
+export function decodeAuthToken<T extends JWTPayload>(token: string): T {
     return decodeJwt(token);
 }
 
-export function decodeAccessToken(token: string) {
+export function decodeAccessToken<T extends JWTPayload>(token: string): T {
     return decodeJwt(token);
 }

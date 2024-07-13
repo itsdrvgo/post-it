@@ -1,6 +1,6 @@
 "use client";
 
-import { DEFAULT_IMAGE_URL } from "@/config/const";
+import { DEFAULT_IMAGE_URL, ROLES } from "@/config/const";
 import { Post } from "@/lib/drizzle/schema";
 import { trpc } from "@/lib/trpc/client";
 import {
@@ -17,14 +17,14 @@ import {
 import { UserClientData } from "@/lib/validation/user";
 import { GenericProps } from "@/types";
 import NextImage from "next/image";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import LiteYouTubeEmbed from "react-lite-youtube-embed";
 import "react-lite-youtube-embed/dist/LiteYouTubeEmbed.css";
 import { toast } from "sonner";
-import ImageViewModal from "../global/modals/image-view-modal";
-import { Icons } from "../icons/icons";
-import { setToken } from "../providers/client";
+import { ViewImageModal } from "../global/modals";
+import { Icons } from "../icons";
+import { setToken } from "../providers";
 import {
     AlertDialog,
     AlertDialogContent,
@@ -53,6 +53,14 @@ interface PageProps extends GenericProps {
 
 function PostCard({ post, user, className, ...props }: PageProps) {
     const router = useRouter();
+    const pathname = usePathname();
+
+    const { refetch } = trpc.posts.getInfinitePosts.useInfiniteQuery(
+        {},
+        {
+            getNextPageParam: (lastPage) => lastPage.nextCursor,
+        }
+    );
 
     const [image, setImage] = useState<string | null>(null);
     const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -73,10 +81,11 @@ function PostCard({ post, user, className, ...props }: PageProps) {
                 });
 
                 setDeleteModalOpen(false);
-                router.push("/");
+                if (pathname === "/") refetch();
+                else router.push("/");
             },
             onError: (err, _, ctx) => {
-                handleClientError(err, ctx?.toastId);
+                return handleClientError(err, ctx?.toastId);
             },
         });
 
@@ -159,7 +168,8 @@ function PostCard({ post, user, className, ...props }: PageProps) {
                                 Copy Link
                             </DropdownMenuItem>
 
-                            {user.id === post.author.id && (
+                            {(user.id === post.author.id ||
+                                user.role !== ROLES.USER) && (
                                 <>
                                     <DropdownMenuSeparator />
 
@@ -327,7 +337,7 @@ function PostCard({ post, user, className, ...props }: PageProps) {
                                 onMouseEnter={() => setIsHoveringOnImage(true)}
                                 onMouseLeave={() => setIsHoveringOnImage(false)}
                             >
-                                <ImageViewModal
+                                <ViewImageModal
                                     image={image ?? ""}
                                     isOpen={isImageViewModalOpen}
                                     setIsOpen={setImageViewModalOpen}

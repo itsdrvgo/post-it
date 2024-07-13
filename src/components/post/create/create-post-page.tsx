@@ -2,7 +2,6 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import Loader from "@/components/ui/loader";
 import { Textarea } from "@/components/ui/textarea";
 import { DEFAULT_IMAGE_URL } from "@/config/const";
 import { UploadEvent, useDropzone } from "@/hooks/useDropzone";
@@ -25,14 +24,15 @@ import { useEffect, useRef, useState } from "react";
 import LiteYouTubeEmbed from "react-lite-youtube-embed";
 import "react-lite-youtube-embed/dist/LiteYouTubeEmbed.css";
 import { setToken } from "@/components/providers/client";
+import { Loader } from "@/components/ui/loader";
 import { toast } from "sonner";
-import { Icons } from "../../icons/icons";
+import { Icons } from "../../icons";
 
 interface PageProps extends GenericProps {
     user: UserClientData;
 }
 
-function CreatePostPage({ user, className, ...props }: PageProps) {
+export function CreatePostPage({ user, className, ...props }: PageProps) {
     const router = useRouter();
 
     const { processFiles, uploadConfig } = useDropzone();
@@ -127,7 +127,7 @@ function CreatePostPage({ user, className, ...props }: PageProps) {
             router.push("/");
         },
         onError: (err) => {
-            handleClientError(err, toastId);
+            return handleClientError(err, toastId);
         },
         onSettled: () => {
             setIsLoading(false);
@@ -191,7 +191,7 @@ function CreatePostPage({ user, className, ...props }: PageProps) {
             });
         } catch (err) {
             setIsLoading(false);
-            handleClientError(err, toastId);
+            return handleClientError(err, toastId);
         }
     };
 
@@ -457,5 +457,3 @@ function CreatePostPage({ user, className, ...props }: PageProps) {
         </div>
     );
 }
-
-export default CreatePostPage;

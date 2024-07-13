@@ -15,7 +15,7 @@ export const setToken = (newToken: string) => {
     token = newToken;
 };
 
-function ClientProvider({ children }: LayoutProps) {
+export function ClientProvider({ children }: LayoutProps) {
     const [queryClient] = useState(() => new QueryClient());
 
     const [trpcClient] = useState(() =>
@@ -50,5 +50,3 @@ function ClientProvider({ children }: LayoutProps) {
         </trpc.Provider>
     );
 }
-
-export default ClientProvider;

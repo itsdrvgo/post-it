@@ -1,6 +1,6 @@
-import NoPostPage from "@/components/global/404/no-post";
-import PostFetch from "@/components/post/view/post-fetch";
-import Loader from "@/components/ui/loader";
+import { NoPostPage } from "@/components/global/404";
+import { PostFetch } from "@/components/post";
+import { Loader } from "@/components/ui/loader";
 import { siteConfig } from "@/config/site";
 import { db } from "@/lib/drizzle";
 import { posts } from "@/lib/drizzle/schema";

@@ -15,6 +15,20 @@
       "when": 1711287037889,
       "tag": "0001_ordinary_starjammers",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1720363445881,
+      "tag": "0002_massive_leader",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1720539095020,
+      "tag": "0003_perfect_madame_hydra",
+      "breakpoints": true
     }
   ]
 }

@@ -1,5 +1,4 @@
-import Footer from "@/components/global/footer/footer";
-import Navbar from "@/components/global/navbar/navbar";
+import { Footer, Navbar } from "@/components/global/layouts";
 import { LayoutProps } from "@/types";
 import { Metadata } from "next";
 

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PAGES, TOKENS } from "./config/const";
 import { decodeAuthToken, verifyAuthToken } from "./lib/jwt";
-import { isAuthTokenInCache } from "./lib/redis/methods/token";
+import { isAuthTokenInCache } from "./lib/redis/methods";
 import { CResponse } from "./lib/utils";
 
 export async function middleware(req: NextRequest) {
@@ -49,11 +49,14 @@ export async function middleware(req: NextRequest) {
     const isTokenValid = await isAuthTokenInCache(userId, authToken);
     if (!isTokenValid) return deleteBrowserCookiesGeneral(req);
 
+    if (url.pathname === PAGES.ADMIN_PAGE)
+        return NextResponse.redirect(new URL("/admin/users", req.url));
+
     return res;
 }
 
 export const config = {
-    matcher: ["/", "/profile", "/auth", "/api/token", "/api/uploads"],
+    matcher: ["/", "/profile", "/auth", "/admin", "/api/token", "/api/uploads"],
 };
 
 function deleteBrowserCookiesGeneral(req: NextRequest) {

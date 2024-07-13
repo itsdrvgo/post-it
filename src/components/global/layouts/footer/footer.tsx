@@ -1,16 +1,16 @@
 import { Link } from "@/components/ui/link";
 import { cn } from "@/lib/utils";
 import { DetailedHTMLProps, HTMLAttributes } from "react";
-import Warning from "../404/warning";
-import Vercel from "../svgs/Vercel";
+import { Warning } from "../../404";
+import { Vercel } from "../../svgs";
 
-function Footer({
+export function Footer({
     className,
     ...props
 }: DetailedHTMLProps<HTMLAttributes<HTMLElement>, HTMLElement>) {
     return (
         <>
-            <Warning content="WE DO NOT REGULATE THE CONTENT OF THE PAGE." />
+            <Warning content="WE DO NOT ALWAYS REGULATE THE CONTENT OF THE PAGE." />
 
             <footer
                 className={cn(
@@ -41,5 +41,3 @@ function Footer({
         </>
     );
 }
-
-export default Footer;

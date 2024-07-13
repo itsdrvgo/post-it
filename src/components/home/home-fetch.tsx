@@ -8,7 +8,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import PostsPage from "./posts-page";
 
-async function HomeFetch() {
+export async function HomeFetch() {
     const cookieStore = cookies();
     const authToken = cookieStore.get(TOKENS.AUTH_COOKIE_NAME)?.value;
     if (!authToken) redirect(PAGES.AUTH_PAGE);
@@ -25,5 +25,3 @@ async function HomeFetch() {
 
     return <PostsPage user={parsedUser} />;
 }
-
-export default HomeFetch;

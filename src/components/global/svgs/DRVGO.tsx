@@ -1,6 +1,6 @@
 import { SVGProps } from "react";
 
-function DRVGO({
+export function DRVGO({
     width,
     height,
     className,
@@ -45,5 +45,3 @@ function DRVGO({
         </svg>
     );
 }
-
-export default DRVGO;

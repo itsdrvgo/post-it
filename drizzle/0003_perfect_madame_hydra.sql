@@ -1,0 +1,1 @@
+ALTER TABLE "post_it__posts" ADD COLUMN "status" text DEFAULT 'pending' NOT NULL;

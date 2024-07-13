@@ -7,9 +7,9 @@ import { GenericProps } from "@/types";
 import { eq } from "drizzle-orm";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import CreatePostPage from "./create-post-page";
+import { CreatePostPage } from "./create-post-page";
 
-async function CreateFetch(props: GenericProps) {
+export async function CreateFetch(props: GenericProps) {
     const cookieStore = cookies();
     const authToken = cookieStore.get(TOKENS.AUTH_COOKIE_NAME)?.value;
     if (!authToken) redirect(PAGES.AUTH_PAGE);
@@ -26,5 +26,3 @@ async function CreateFetch(props: GenericProps) {
 
     return <CreatePostPage user={parsedUser} {...props} />;
 }
-
-export default CreateFetch;

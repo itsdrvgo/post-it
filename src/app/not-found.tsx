@@ -1,4 +1,4 @@
-import { GoBackButton } from "@/components/global/buttons/go-back-button";
+import { GoBackButton } from "@/components/global/buttons";
 import { EmptyPlaceholder } from "@/components/ui/empty-placeholder";
 import { Metadata } from "next";
 
@@ -9,9 +9,7 @@ export const metadata: Metadata = {
 
 function Page() {
     return (
-        <section
-            className="flex h-full min-h-screen items-center justify-center bg-background"
-        >
+        <section className="flex h-full min-h-screen items-center justify-center bg-background">
             <EmptyPlaceholder
                 title="Page not found"
                 description="The page you are looking for does not exist. Please check the URL or go back to the previous page."
