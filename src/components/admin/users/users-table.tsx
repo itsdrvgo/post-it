@@ -27,20 +27,11 @@ import { DataTablePagination, DataTableViewOptions } from "./data-table";
 interface UserTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[];
     data: TData[];
-    pageCount: number;
-    userCount: number;
-    isFetchingNextPage: boolean;
-    handleLoadMore: () => void;
-    hasNextPage: boolean;
 }
 
 export function UsersTable<TData, TValue>({
     columns,
     data,
-    pageCount,
-    userCount,
-    isFetchingNextPage,
-    handleLoadMore,
 }: UserTableProps<TData, TValue>) {
     const [sorting, setSorting] = useState<SortingState>([]);
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -143,13 +134,7 @@ export function UsersTable<TData, TValue>({
                 </Table>
             </div>
 
-            <DataTablePagination
-                table={table}
-                userCount={userCount}
-                pageCount={pageCount}
-                isFetchingNextPage={isFetchingNextPage}
-                handleLoadMore={handleLoadMore}
-            />
+            <DataTablePagination table={table} />
         </div>
     );
 }

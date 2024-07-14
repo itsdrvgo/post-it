@@ -16,10 +16,7 @@ A simple rip-off of social media apps like Twitter, Facebook, Instagram, etc. Th
 
 ## !! ⚠ KNOWN ISSUES & TO-DOs !!
 
--   The Users table in `/admin/users` does not work as expected. Even though the API is configured correctly, upon clicking the next page, the data is not displayed properly.
-    -   Apparantly, there is a bug rendering the data in the table. As ShadCN does not natively provide asynchronous data rendering, we have to find a workaround for this issue.
-    -   Whenever the next page button is clicked, if previewed on `Network` tab, the next 10 users are fetched correctly, but in the UI, the first 10 users are displayed again.
--   Once this issue is fixed, we have to add option to promote, demote, restrict, unrestrict, and delete a user from the admin panel.
+-   **RESPONSIVE USERS TABLE** - The users table in the Admin Panel is not responsive. It is recommended to view the Admin Panel on a desktop or a laptop.
 
 ## Tech Stack
 

@@ -430,4 +430,121 @@ export const userRouter = createTRPCRouter({
                 },
             };
         }),
+    manageUserRestriction: adminOnlyProcedure
+        .input(
+            z.object({
+                id: z.string(),
+                isRestricted: z.boolean(),
+            })
+        )
+        .use(async ({ input, ctx, next }) => {
+            const { id } = input;
+            const { db, users } = ctx;
+
+            const existingUser = await db.query.users.findFirst({
+                where: eq(users.id, id),
+            });
+            if (!existingUser)
+                throw new TRPCError({
+                    code: "NOT_FOUND",
+                    message: "User not found",
+                });
+
+            if (existingUser.role === ROLES.ADMIN)
+                throw new TRPCError({
+                    code: "FORBIDDEN",
+                    message: "Cannot restrict an admin",
+                });
+
+            if (existingUser.isRestricted === input.isRestricted)
+                throw new TRPCError({
+                    code: "BAD_REQUEST",
+                    message: `User is already ${
+                        input.isRestricted ? "restricted" : "unrestricted"
+                    }`,
+                });
+
+            return next({
+                ctx: {
+                    ...ctx,
+                    existingUser,
+                },
+            });
+        })
+        .mutation(async ({ ctx, input }) => {
+            const { id, isRestricted } = input;
+            const { db, users } = ctx;
+
+            const updatedUser = (
+                await db
+                    .update(users)
+                    .set({
+                        isRestricted,
+                    })
+                    .where(eq(users.id, id))
+                    .returning()
+            )[0];
+
+            return {
+                user: {
+                    ...updatedUser,
+                    password: undefined,
+                },
+            };
+        }),
+    deleteUserById: adminOnlyProcedure
+        .input(z.object({ id: z.string() }))
+        .use(async ({ input, ctx, next }) => {
+            const { id } = input;
+            const { db, users } = ctx;
+
+            const existingUser = await db.query.users.findFirst({
+                where: eq(users.id, id),
+            });
+            if (!existingUser)
+                throw new TRPCError({
+                    code: "NOT_FOUND",
+                    message: "User not found",
+                });
+
+            if (existingUser.role === ROLES.ADMIN)
+                throw new TRPCError({
+                    code: "FORBIDDEN",
+                    message: "Cannot delete an admin",
+                });
+
+            return next({
+                ctx: {
+                    ...ctx,
+                    existingUser,
+                },
+            });
+        })
+        .mutation(async ({ ctx }) => {
+            const { db, users, posts, existingUser } = ctx;
+
+            const postsData = await db.query.posts.findMany({
+                where: eq(posts.authorId, existingUser.id),
+            });
+
+            if (postsData.length)
+                await Promise.all(
+                    postsData.map(async (post) => {
+                        if (post.attachments.length) {
+                            await utapi.deleteFiles(
+                                post.attachments
+                                    .filter(
+                                        (attachment) =>
+                                            attachment?.type !== "text"
+                                    )
+                                    .map((attachment) => attachment!.id)
+                            );
+                        }
+                    })
+                );
+
+            await db.delete(users).where(eq(users.id, existingUser.id));
+            await db.delete(posts).where(eq(posts.authorId, existingUser.id));
+            await removeAuthTokenFromCache(existingUser.id);
+        }),
 });
