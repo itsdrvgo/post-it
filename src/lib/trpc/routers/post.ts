@@ -158,6 +158,18 @@ export const postRouter = createTRPCRouter({
 
             return next({ ctx });
         })
+        .use(async ({ ctx, next }) => {
+            const { user } = ctx;
+
+            if (user.isRestricted)
+                throw new TRPCError({
+                    code: "FORBIDDEN",
+                    message:
+                        "Your account is restricted from creating posts. Please contact the administrator for more information.",
+                });
+
+            return next({ ctx });
+        })
         .mutation(async ({ input, ctx }) => {
             const { db, posts } = ctx;
 
@@ -165,7 +177,7 @@ export const postRouter = createTRPCRouter({
             if (profaneState === POST_STATUS.REJECTED)
                 throw new TRPCError({
                     code: "UNPROCESSABLE_CONTENT",
-                    message: "Post contains profanity and cannot be submitted",
+                    message: "Post contains profanity and cannot be posted",
                 });
 
             await db.insert(posts).values({
