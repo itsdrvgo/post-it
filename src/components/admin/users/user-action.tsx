@@ -32,6 +32,7 @@ export function UserAction({ user }: PageProps) {
         {},
         {
             getNextPageParam: (lastPage) => lastPage.nextCursor,
+            refetchOnMount: false,
         }
     );
 

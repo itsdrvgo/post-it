@@ -95,6 +95,7 @@ export function UsersPage({ className, ...props }: PageProps) {
             {},
             {
                 getNextPageParam: (lastPage) => lastPage.nextCursor,
+                refetchOnMount: false,
             }
         );
 

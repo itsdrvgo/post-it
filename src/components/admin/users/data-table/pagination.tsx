@@ -19,6 +19,7 @@ export function DataTablePagination<TData>({
             {},
             {
                 getNextPageParam: (lastPage) => lastPage.nextCursor,
+                refetchOnMount: false,
             }
         );
 
@@ -34,13 +35,11 @@ export function DataTablePagination<TData>({
 
     useEffect(() => {
         async function waitAndSetPage() {
-            if (!isFetchingNextPage) {
-                await wait(10);
-                table.setPageIndex(currentPage - 1);
-            }
+            await wait(50);
+            table.setPageIndex(currentPage - 1);
         }
 
-        waitAndSetPage();
+        if (!isFetchingNextPage) waitAndSetPage();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isFetchingNextPage]);
 
@@ -48,7 +47,7 @@ export function DataTablePagination<TData>({
         if (currentPage === lastLoadedPage) {
             if (hasNextPage) {
                 fetchNextPage();
-                setLastLoadedPage(currentPage + 1);
+                setLastLoadedPage(lastLoadedPage + 1);
                 setCurrentPage(currentPage + 1);
             }
         } else {
@@ -85,6 +84,7 @@ export function DataTablePagination<TData>({
 
                 <div className="flex items-center space-x-2">
                     <Button
+                        type="button"
                         variant="outline"
                         className="size-8 p-0"
                         onClick={goPreviousPage}
@@ -95,6 +95,7 @@ export function DataTablePagination<TData>({
                     </Button>
 
                     <Button
+                        type="button"
                         variant="outline"
                         className="size-8 p-0"
                         onClick={goNextPage}
