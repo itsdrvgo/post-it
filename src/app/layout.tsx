@@ -2,7 +2,7 @@ import "./globals.css";
 import { ClientProvider } from "@/components/providers";
 import { Toaster } from "@/components/ui/sonner";
 import { siteConfig } from "@/config/site";
-import { Metadata } from "next";
+import { Metadata, Viewport } from "next";
 import { Titillium_Web } from "next/font/google";
 import { cn, getAbsoluteURL } from "../lib/utils";
 import { LayoutProps } from "../types";
@@ -25,6 +25,14 @@ export const metadata: Metadata = {
             url: getAbsoluteURL(),
         },
     ],
+    formatDetection: {
+        telephone: false,
+    },
+    appleWebApp: {
+        capable: true,
+        statusBarStyle: "default",
+        title: siteConfig.name,
+    },
     creator: siteConfig.name,
     openGraph: {
         type: "website",
@@ -51,11 +59,15 @@ export const metadata: Metadata = {
     },
     icons: {
         icon: "/favicon.ico",
-        shortcut: "/favicon-16x16.png",
-        apple: "/apple-touch-icon.png",
+        shortcut: "/icons/favicon-16x16.png",
+        apple: "/icons/apple-touch-icon.png",
     },
-    manifest: getAbsoluteURL("/site.webmanifest"),
+    manifest: "/manifest.json",
     metadataBase: new URL(getAbsoluteURL()),
+};
+
+export const viewport: Viewport = {
+    themeColor: "#333333",
 };
 
 function RootLayout({ children }: LayoutProps) {
