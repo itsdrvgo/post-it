@@ -8,7 +8,7 @@ export function NavbarDash() {
 
     return (
         <header className="border-b bg-background">
-            <nav className="flex h-11 items-center">
+            <nav className="flex h-14 items-center">
                 <div className="p-2 px-6">
                     <p className="text-sm text-muted-foreground">
                         {generatePathTitle(pathname)}

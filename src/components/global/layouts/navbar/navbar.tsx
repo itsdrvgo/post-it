@@ -22,6 +22,7 @@ import { motion, useMotionValueEvent, useScroll } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import { PostIT } from "../../svgs";
 
 export function Navbar() {
     const router = useRouter();
@@ -87,13 +88,8 @@ export function Navbar() {
                 data-menu-open={isMenuOpen}
             >
                 <nav className="flex w-full max-w-5xl items-center justify-between gap-5">
-                    <Link
-                        type="link"
-                        href="/"
-                        className="space-x-px text-2xl font-bold"
-                    >
-                        <span>Post</span>
-                        <span className="text-primary">IT</span>
+                    <Link type="link" href="/">
+                        <PostIT className="size-8" />
                     </Link>
 
                     <ul className="hidden gap-2 sm:flex md:gap-4">
@@ -248,14 +244,26 @@ export function Navbar() {
 
                 {!isPending && data?.user && (
                     <div className="space-y-5 rounded-xl border p-5">
-                        <User
-                            name={data.user.username}
-                            description={"@" + data.user.username}
-                            avatar={{
-                                src: DEFAULT_IMAGE_URL,
-                                alt: data?.user?.username,
-                            }}
-                        />
+                        <div className="flex items-center justify-between gap-5">
+                            <User
+                                name={data.user.username}
+                                description={"@" + data.user.username}
+                                avatar={{
+                                    src: DEFAULT_IMAGE_URL,
+                                    alt: data?.user?.username,
+                                }}
+                            />
+
+                            <Button
+                                size="icon"
+                                variant="ghost"
+                                onClick={handleSignout}
+                                isDisabled={isSigningOut}
+                                isLoading={isSigningOut}
+                            >
+                                <Icons.logout className="size-4" />
+                            </Button>
+                        </div>
 
                         <div className="flex justify-between gap-2">
                             <Link
@@ -267,15 +275,17 @@ export function Navbar() {
                                 Profile
                             </Link>
 
-                            <Button
-                                variant="destructive"
-                                className="w-full"
-                                onClick={handleSignout}
-                                isDisabled={isSigningOut}
-                                isLoading={isSigningOut}
-                            >
-                                Logout
-                            </Button>
+                            {data.user.role !== ROLES.USER && (
+                                <Link
+                                    type="button"
+                                    variant="secondary"
+                                    href="/admin"
+                                    className="w-full font-semibold"
+                                    onClick={() => setIsMenuOpen(false)}
+                                >
+                                    Admin Panel
+                                </Link>
+                            )}
                         </div>
                     </div>
                 )}

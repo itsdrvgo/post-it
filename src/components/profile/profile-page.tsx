@@ -144,7 +144,7 @@ function ProfilePage({ className, user, ...props }: PageProps) {
                             <span>{user.username}</span>
                         </p>
 
-                        <div className="hidden justify-between gap-2 md:flex">
+                        <div className="flex justify-center md:justify-start">
                             <p>
                                 <span className="mr-1 font-semibold">
                                     {shortenNumber(postCount ?? 0)}

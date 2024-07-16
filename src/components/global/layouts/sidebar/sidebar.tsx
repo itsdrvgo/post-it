@@ -19,6 +19,7 @@ import { UserClientData } from "@/lib/validation";
 import { GenericProps } from "@/types";
 import { usePathname } from "next/navigation";
 import { LogoutButton } from "../../buttons";
+import { PostIT } from "../../svgs";
 
 interface List {
     category: string;
@@ -97,7 +98,6 @@ export function Sidebar({ className, params, ...props }: PageProps) {
                     "border-r border-border/10 bg-background",
                     "h-full w-14 data-[state=expanded]:w-64 md:w-[4.5rem]",
                     "transition-width flex flex-col duration-200 ease-in-out",
-                    "selection:bg-white selection:text-foreground",
                     className
                 )}
                 onMouseEnter={() => setIsSidebarOpen(true)}
@@ -106,13 +106,13 @@ export function Sidebar({ className, params, ...props }: PageProps) {
                 }
                 {...props}
             >
-                <div className="flex items-center p-2 px-4 md:px-6">
+                <div className="flex items-center p-4 md:px-6">
                     <Link
                         type="link"
                         href="/admin"
-                        className="flex items-center gap-2 text-lg font-semibold"
+                        className="flex items-center gap-2 text-xl font-semibold"
                     >
-                        <Icons.dashboard className="size-5" />
+                        <PostIT width={25} height={25} />
                         <div
                             className={cn(
                                 "whitespace-nowrap text-white transition-opacity ease-in-out",
