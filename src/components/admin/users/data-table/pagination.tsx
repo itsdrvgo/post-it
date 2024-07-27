@@ -1,11 +1,10 @@
 import { Icons } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
-import { useDynamicTablePageStore, useTablePageStore } from "@/lib/store";
 import { trpc } from "@/lib/trpc/client";
 import { wait } from "@/lib/utils";
 import { Table } from "@tanstack/react-table";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 interface DataTablePaginationProps<TData> {
     table: Table<TData>;
@@ -23,15 +22,8 @@ export function DataTablePagination<TData>({
             }
         );
 
-    const currentPage = useTablePageStore((state) => state.currentPage);
-    const setCurrentPage = useTablePageStore((state) => state.setCurrentPage);
-
-    const lastLoadedPage = useDynamicTablePageStore(
-        (state) => state.lastLoadedPage
-    );
-    const setLastLoadedPage = useDynamicTablePageStore(
-        (state) => state.setLastLoadedPage
-    );
+    const [currentPage, setCurrentPage] = useState(1);
+    const [lastLoadedPage, setLastLoadedPage] = useState(1);
 
     useEffect(() => {
         async function waitAndSetPage() {
