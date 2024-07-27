@@ -65,7 +65,7 @@ export function UpdatePasswordForm() {
                 return { toastId };
             },
             onSuccess: (_, __, ctx) => {
-                toast.success("Username updated successfully!", {
+                toast.success("Password updated successfully!", {
                     id: ctx.toastId,
                 });
                 router.refresh();
