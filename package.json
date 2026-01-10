@@ -51,7 +51,7 @@
     "jose": "latest",
     "jsdom": "latest",
     "lucide-react": "latest",
-    "next": "latest",
+    "next": "15.5.8",
     "postgres": "latest",
     "react": "latest",
     "react-dom": "latest",
